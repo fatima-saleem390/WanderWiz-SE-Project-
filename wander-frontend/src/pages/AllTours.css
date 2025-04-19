@@ -1,15 +1,37 @@
+.all-tours-page {
+  font-family: Arial, sans-serif;
+}
+
+.banner-container {
+  position: relative;
+  width: 100%;
+  max-height: 300px; /* Adjusted to use max-height */
+  overflow: hidden;
+}
+
 .banner {
-    width: 100%;
-    max-height: 300px;
-    object-fit: cover;
-    border-radius: 10px;
-  }
-  
-  .tour-grid {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 20px;
-    padding: 20px;
-    justify-content: center;
-  }
-  
+  width: 100%;
+  max-height: 300px; /* Ensure the banner has a max height */
+  object-fit: cover; /* Make sure the image covers the area without distorting */
+  border-radius: 10px; /* Rounded corners for the banner */
+}
+
+.banner-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: orange;
+  text-align: center;
+  font-size: 2rem;
+  font-weight: bold;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); /* Optional: adds text shadow for better readability */
+}
+
+.tour-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  padding: 20px;
+  justify-content: center; /* Centers the grid items */
+}

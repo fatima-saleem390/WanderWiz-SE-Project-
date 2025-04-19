@@ -1,5 +1,3 @@
-// src/components/Header.js
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 import '../assets/logo.png'; // Ensure logo exists
@@ -12,11 +10,11 @@ const Header = () => {
         <img src={require('../assets/logo.png')} alt="WanderWiz Logo" />
       </div>
       <nav className="nav-links">
-        <Link to="/">Home</Link>
-        <Link to="/about">About</Link>
-        <Link to="/listing">Listing</Link>
-        <Link to="/login">Login</Link>
-        <button className="post-btn">Post a trip</button>
+        <Link to="/" className="home-link">Home</Link>
+        <Link to="/about" className="about-link">About</Link>
+        <Link to="/listing" className="listing-link">Listing</Link> {/* Apply the listing-link class */}
+        <Link to="/login" className="login-link">Login</Link>
+        <button className="post-btn">Plan a trip</button>
       </nav>
     </header>
   );
