@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import '../assets/logo.png'; // Ensure logo exists
-import '../components/Header.css';
+import '../assets/logo.png';
+import './Header.css';
 
 const Header = () => {
   return (
@@ -12,9 +12,11 @@ const Header = () => {
       <nav className="nav-links">
         <Link to="/" className="home-link">Home</Link>
         <Link to="/about" className="about-link">About</Link>
-        <Link to="/listing" className="listing-link">Listing</Link> {/* Apply the listing-link class */}
+        <Link to="/listing" className="listing-link">Listing</Link>
         <Link to="/login" className="login-link">Login</Link>
-        <button className="post-btn">Plan a trip</button>
+        <Link to="/plan-trip">
+          <button className="post-btn">Plan a trip</button>
+        </Link>
       </nav>
     </header>
   );
