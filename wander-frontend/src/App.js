@@ -1,4 +1,3 @@
-// src/App.js
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Header from './components/Header';
@@ -8,8 +7,10 @@ import About from './pages/About';
 import Login from './pages/Login';
 import AllTours from './pages/AllTours';
 import PlanTrip from './pages/PlanTrip';
-import Gallery from './pages/Gallery';  // Import Gallery
-import Register from './pages/Register';  // Import Register
+import TourDetails from './pages/TourDetails';
+import HistoricalPlaces from './pages/HistoricalPlaces';
+import Restaurants from './pages/Restaurants';
+import Hotels from './pages/Hotels';
 
 function App() {
   return (
@@ -22,8 +23,12 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/listing" element={<AllTours />} />
           <Route path="/plan-trip" element={<PlanTrip />} />
-          <Route path="/gallery" element={<Gallery />} />  {/* Route for Gallery */}
-          <Route path="/register" element={<Register />} />  {/* Route for Register */}
+          
+          {/* Tour Details Route */}
+          <Route path="/tour-details/:id" element={<TourDetails />} />
+          <Route path="/tour-details/:id/historical-places" element={<HistoricalPlaces />} />
+          <Route path="/tour-details/:id/restaurants" element={<Restaurants />} />
+          <Route path="/tour-details/:id/hotels" element={<Hotels />} />
         </Routes>
       </main>
       <Footer />

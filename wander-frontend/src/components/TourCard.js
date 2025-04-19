@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom'; // Import Link for navigation
 import './TourCard.css';
 
 const TourCard = ({ tour }) => {
@@ -27,7 +28,7 @@ const TourCard = ({ tour }) => {
     }
 
     if (hasHalfStar) {
-      stars.push(<span key="half" className="star">&#9733;</span>); // Could be replaced with custom half-star logic/icon
+      stars.push(<span key="half" className="star">&#9733;</span>);
     }
 
     for (let i = 0; i < emptyStars; i++) {
@@ -40,9 +41,18 @@ const TourCard = ({ tour }) => {
   return (
     <div className="tour-card">
       <img src={imageSrc} alt={tour.title} />
-      <h3>{tour.title}</h3>
-      <div className="rating">
-        {renderStars(tour.rating)}
+      <h3>
+        <Link to={`/tour/${tour.id}`} className="city-link">
+          {tour.title} {/* City name wrapped in Link */}
+        </Link>
+      </h3>
+      <div className="rating-review">
+        <div className="rating">
+          {renderStars(tour.rating)} {/* Just stars */}
+        </div>
+        <div className="review-count">
+          ({tour.reviews}) {/* Only reviews count */}
+        </div>
       </div>
     </div>
   );

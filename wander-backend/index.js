@@ -1,5 +1,3 @@
-// wander-backend/index.js
-
 const express = require('express');
 const cors = require('cors');
 const app = express();
@@ -8,23 +6,84 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Sample tours data (you can connect to DB later)
+// Sample tours data with reviews, historical places, restaurants, and hotels
 const tours = [
-  { id: 1, title: "Lahore", rating: 4.7, image: "Lahore.jpg" },
-  { id: 2, title: "Karachi", rating: 4.5, image: "Karachi.jpg" },
-  { id: 3, title: "Islamabad", rating: 4.8, image: "Islamabad.jpg" },
-  { id: 4, title: "Peshawar", rating: 4.4, image: "Peshawar.jpg" },
-  { id: 5, title: "Quetta", rating: 4.3, image: "Quetta.jpg" },
-  { id: 6, title: "Faisalabad", rating: 4.2, image: "Faisalabad.jpg" },
-  { id: 7, title: "Hyderabad", rating: 4.1, image: "Hyderabad.jpg" },
-  { id: 8, title: "Multan", rating: 4.6, image: "Multan.jpg" },
-  { id: 9, title: "Sukkur", rating: 4.0, image: "Sukkur.jpg" },
-  { id: 10, title: "Mansehra", rating: 4.2, image: "Mansehra.jpg" }
+  {
+    id: 1, title: "Lahore", rating: 4.7, reviews: 120, image: "Lahore.jpg",
+    historicalPlaces: ["Badshahi Mosque", "Lahore Fort", "Shalimar Gardens"],
+    restaurants: ["The Chaiwala", "Café Zouk", "Salt Bae"],
+    hotels: ["Pearl Continental", "Lahore Marriott", "The Nishat Hotel"]
+  },
+  {
+    id: 2, title: "Karachi", rating: 4.5, reviews: 95, image: "Karachi.jpg",
+    historicalPlaces: ["Mazar-e-Quaid", "Karachi Marina Club", "Frere Hall"],
+    restaurants: ["Kolachi", "Chai Wala", "Café Flo"],
+    hotels: ["Pearl Continental Karachi", "The Oberoi", "Marriott Karachi"]
+  },
+  {
+    id: 3, title: "Islamabad", rating: 4.8, reviews: 200, image: "Islamabad.jpg",
+    historicalPlaces: ["Faisal Mosque", "Lok Virsa Museum", "Daman-e-Koh"],
+    restaurants: ["Tuscany Courtyard", "Chaaye Khana", "Kabul Restaurant"],
+    hotels: ["Serena Hotel", "Islamabad Marriott", "Pearl Continental"]
+  },
+  {
+    id: 4, title: "Peshawar", rating: 4.4, reviews: 75, image: "Peshawar.jpg",
+    historicalPlaces: ["Bala Hisar Fort", "Peshawar Museum", "Qissa Khwani Bazaar"],
+    restaurants: ["Chai Wala", "The Monal", "Peshawar Club"],
+    hotels: ["Pearl Continental Peshawar", "Hotel Pearl Inn", "Shelton's Rezidor"]
+  },
+  {
+    id: 5, title: "Quetta", rating: 4.3, reviews: 50, image: "Quetta.jpg",
+    historicalPlaces: ["Hazarganji Chiltan National Park", "Quetta Museum", "Bolan Pass"],
+    restaurants: ["Restaurant at Pearl Continental", "Pakeeza Restaurant", "Chaiwala"],
+    hotels: ["Pearl Continental Quetta", "Quetta Serena Hotel", "Zara's Hotel"]
+  },
+  {
+    id: 6, title: "Faisalabad", rating: 4.2, reviews: 65, image: "Faisalabad.jpg",
+    historicalPlaces: ["Clock Tower", "Lyallpur Museum", "Chiniot"],
+    restaurants: ["Tandoor Restaurant", "Khyber Restaurant", "Sultan Restaurant"],
+    hotels: ["Faisalabad Serena Hotel", "Faisalabad Marriott", "The Nishat Hotel"]
+  },
+  {
+    id: 7, title: "Hyderabad", rating: 4.1, reviews: 30, image: "Hyderabad.jpg",
+    historicalPlaces: ["Pakistani Gate", "Miani Sahib Graveyard", "Qutub Shahi Tombs"],
+    restaurants: ["Hyderabadi Biryani", "The Kolachi", "Ramsar Restaurant"],
+    hotels: ["Hotel One Hyderabad", "Pearl Continental Hyderabad", "The Hyderabad Hotel"]
+  },
+  {
+    id: 8, title: "Multan", rating: 4.6, reviews: 110, image: "Multan.jpg",
+    historicalPlaces: ["Multan Fort", "Shrine of Bahauddin Zakariya", "Multan Museum"],
+    restaurants: ["Royal Restaurant", "The Monal", "Multan Grill"],
+    hotels: ["Pearl Continental Multan", "The Nishat Hotel", "Multan Sarai"]
+  },
+  {
+    id: 9, title: "Sukkur", rating: 4.0, reviews: 40, image: "Sukkur.jpg",
+    historicalPlaces: ["Sukkur Barrage", "Naushero Feroz", "Rohri Hills"],
+    restaurants: ["The Monal Sukkur", "Tandoor Restaurant", "Café Wali"],
+    hotels: ["Sukkur Marriott", "Indus Hotel", "Sukkur Palace"]
+  },
+  {
+    id: 10, title: "Mansehra", rating: 4.2, reviews: 60, image: "Mansehra.jpg",
+    historicalPlaces: ["Mansehra Rock", "Balakot", "Shogran Valley"],
+    restaurants: ["Haveli Restaurant", "The Cottage Restaurant", "Fazal Din Restaurant"],
+    hotels: ["Pearl Continental Mansehra", "Mansehra Rest House", "Shogran Hotel"]
+  }
 ];
 
-// Route
+// Route to get all tours
 app.get('/api/tours', (req, res) => {
   res.json(tours);
+});
+
+// Route to get a specific tour by ID
+app.get('/api/tours/:id', (req, res) => {
+  const { id } = req.params;
+  const tour = tours.find(t => t.id === parseInt(id));
+
+  if (!tour) {
+    return res.status(404).json({ message: 'Tour not found' });
+  }
+  res.json(tour);
 });
 
 // Start server
