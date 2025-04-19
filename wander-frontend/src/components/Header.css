@@ -1,3 +1,4 @@
+/* Header Styling */
 .header {
   background-color: #ffffff;
   padding: 20px 40px;
@@ -20,41 +21,27 @@
   font-weight: bold;
 }
 
-/* Increased specificity to ensure it overrides other styles */
-.nav-links .listing-link {
-    color: orange !important; /* Orange color for the "Listing" link */
-}
-
-.nav-links .listing-link:hover {
-    color: #ff8f00 !important; /* Darker orange when hovering over the "Listing" link */
-}
-
-/* Default style for other links */
-.nav-links a {
-    text-decoration: none;
-    color: #333;
-    font-size: 16px;
-    position: relative;
-    transition: color 0.3s ease;
-}
-
-.nav-links a:hover {
-    color: #0288d1; /* Default hover effect for other links */
-}
-
-
-.nav-links a {
+/* Default style for nav links */
+.nav-links .nav-link {
   text-decoration: none;
-  color: #333;
+  color: #333; /* Default color is dark grey */
   font-size: 16px;
   position: relative;
   transition: color 0.3s ease;
 }
 
-.nav-links a:hover {
-  color: #0288d1; /* Default hover effect for other links */
+/* Active link (Orange color when selected) */
+.nav-links .active-link {
+  color: orange; /* Active link turns orange */
 }
 
+/* Hover effect for all links */
+.nav-links .nav-link:hover {
+  color: #0288d1; /* Blue hover effect for all links */
+}
+
+
+/* Styling for the "Plan a trip" button */
 .post-btn {
   padding: 8px 16px;
   background-color: #ff6f00;
@@ -70,15 +57,16 @@
   background-color: #ff8f00;
 }
 
+/* Mobile responsiveness */
 @media (max-width: 768px) {
   .nav-links {
-      flex-direction: column;
-      gap: 15px;
-      margin-top: 15px;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 15px;
   }
 
   .header {
-      flex-direction: column;
-      align-items: flex-start;
+    flex-direction: column;
+    align-items: flex-start;
   }
 }

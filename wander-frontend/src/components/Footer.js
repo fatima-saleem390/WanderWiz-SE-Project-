@@ -1,6 +1,6 @@
 // src/components/Footer.js
-
 import React from 'react';
+import { Link } from 'react-router-dom';  // Import Link from react-router-dom
 import '../components/footer.css';
 
 const Footer = () => {
@@ -27,17 +27,17 @@ const Footer = () => {
           <div className="links">
             <h4>Discover</h4>
             <ul>
-              <li>Home</li>
-              <li>About</li>
-              <li>Listing</li>
+              <li><Link to="/">Home</Link></li>
+              <li><Link to="/about">About</Link></li>
+              <li><Link to="/listing">Listing</Link></li>
             </ul>
           </div>
           <div className="links">
             <h4>Quick Links</h4>
             <ul>
-              <li>Gallery</li>
-              <li>Login</li>
-              <li>Register</li>
+              <li><Link to="/gallery">Gallery</Link></li>  {/* Gallery Link */}
+              <li><Link to="/login">Login</Link></li>
+              <li><Link to="/register">Register</Link></li>  {/* Register Link */}
             </ul>
           </div>
           <div className="contact">

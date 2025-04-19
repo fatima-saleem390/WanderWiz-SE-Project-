@@ -1,7 +1,8 @@
+// src/components/Header.js
 import React from 'react';
-import { Link } from 'react-router-dom';
-import '../assets/logo.png';
-import './Header.css';
+import { NavLink } from 'react-router-dom'; // Use NavLink for active links
+import '../assets/logo.png'; 
+import '../components/Header.css';
 
 const Header = () => {
   return (
@@ -10,13 +11,31 @@ const Header = () => {
         <img src={require('../assets/logo.png')} alt="WanderWiz Logo" />
       </div>
       <nav className="nav-links">
-        <Link to="/" className="home-link">Home</Link>
-        <Link to="/about" className="about-link">About</Link>
-        <Link to="/listing" className="listing-link">Listing</Link>
-        <Link to="/login" className="login-link">Login</Link>
-        <Link to="/plan-trip">
-          <button className="post-btn">Plan a trip</button>
-        </Link>
+        <NavLink 
+          to="/" 
+          className={({ isActive }) => isActive ? 'nav-link active-link' : 'nav-link'}
+        >
+          Home
+        </NavLink>
+        <NavLink 
+          to="/about" 
+          className={({ isActive }) => isActive ? 'nav-link active-link' : 'nav-link'}
+        >
+          About
+        </NavLink>
+        <NavLink 
+          to="/listing" 
+          className={({ isActive }) => isActive ? 'nav-link active-link listing-link' : 'nav-link listing-link'}
+        >
+          Listing
+        </NavLink>
+        <NavLink 
+          to="/login" 
+          className={({ isActive }) => isActive ? 'nav-link active-link' : 'nav-link'}
+        >
+          Login
+        </NavLink>
+        <button className="post-btn">Plan a trip</button>
       </nav>
     </header>
   );
