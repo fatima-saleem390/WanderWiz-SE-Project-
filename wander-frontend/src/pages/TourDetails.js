@@ -14,15 +14,15 @@ const TourDetails = () => {
       <h1>{id}</h1>
       <div className="card-container">
         <div className="card" onClick={() => handleNavigate('historical-places')}>
-          <img src="/historical.jpg" alt="Historical Places" />
+          <img src="/assets/historical.jpg" alt="Historical Places" />
           <h3>Historical Places</h3>
         </div>
         <div className="card" onClick={() => handleNavigate('restaurants')}>
-          <img src="/restaurant.jpg" alt="Restaurants" />
+          <img src="/assets/restaurant.jpg" alt="Restaurants" />
           <h3>Restaurants</h3>
         </div>
         <div className="card" onClick={() => handleNavigate('hotels')}>
-          <img src="/hotel.jpg" alt="Hotels" />
+          <img src="/assets/hotel.jpg" alt="Hotels" />
           <h3>Hotels</h3>
         </div>
       </div>

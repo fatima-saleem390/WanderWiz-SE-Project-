@@ -42,7 +42,7 @@ const TourCard = ({ tour }) => {
     <div className="tour-card">
       <img src={imageSrc} alt={tour.title} />
       <h3>
-        <Link to={`/tour/${tour.id}`} className="city-link">
+        <Link to={`/tour-details/${tour.id}`} className="city-link">
           {tour.title} {/* City name wrapped in Link */}
         </Link>
       </h3>

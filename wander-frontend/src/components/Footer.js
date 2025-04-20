@@ -1,7 +1,11 @@
 // src/components/Footer.js
 import React from 'react';
-import { Link } from 'react-router-dom';  // Import Link from react-router-dom
+import { Link } from 'react-router-dom';
 import '../components/footer.css';
+
+// Font Awesome icons
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faYoutube, faInstagram, faTwitter, faFacebook } from '@fortawesome/free-brands-svg-icons';
 
 const Footer = () => {
   return (
@@ -23,7 +27,22 @@ const Footer = () => {
         <div className="footer-sections">
           <div className="brand">
             <img src={require('../assets/logo.png')} alt="WanderWiz" />
+            <div className="social-icons">
+              <a href="https://youtube.com" target="_blank" rel="noopener noreferrer">
+                <FontAwesomeIcon icon={faYoutube} />
+              </a>
+              <a href="https://instagram.com" target="_blank" rel="noopener noreferrer">
+                <FontAwesomeIcon icon={faInstagram} />
+              </a>
+              <a href="https://twitter.com" target="_blank" rel="noopener noreferrer">
+                <FontAwesomeIcon icon={faTwitter} />
+              </a>
+              <a href="https://facebook.com" target="_blank" rel="noopener noreferrer">
+                <FontAwesomeIcon icon={faFacebook} />
+              </a>
+            </div>
           </div>
+
           <div className="links">
             <h4>Discover</h4>
             <ul>
@@ -32,14 +51,16 @@ const Footer = () => {
               <li><Link to="/listing">Listing</Link></li>
             </ul>
           </div>
+
           <div className="links">
             <h4>Quick Links</h4>
             <ul>
-              <li><Link to="/gallery">Gallery</Link></li>  {/* Gallery Link */}
+              <li><Link to="/gallery">Gallery</Link></li>
               <li><Link to="/login">Login</Link></li>
-              <li><Link to="/register">Register</Link></li>  {/* Register Link */}
+              <li><Link to="/register">Register</Link></li>
             </ul>
           </div>
+
           <div className="contact">
             <h4>Contact</h4>
             <p>📍 Address: Lorem</p>
