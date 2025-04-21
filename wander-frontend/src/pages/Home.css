@@ -1,0 +1,321 @@
+.home-container {
+    display: flex;
+    flex-direction: row; /* Change from column to row */
+    align-items: flex-start; /* Align top edges */
+    justify-content: space-between;
+    gap: 2rem;
+    padding: 4rem 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+    flex-wrap: wrap; /* Optional: to handle smaller screens */
+  }
+  
+  
+  .home-text {
+    text-align: left;
+    max-width: 600px;
+    margin-bottom: 3rem;
+    flex: 1 1 45%;
+  }
+  
+  .know-button {
+    background-color: #fbb03b;
+    color: #ffffff;
+    font-family: 'Cursive',serif;
+    font-style:italic;
+    font-size: 1.1rem;
+    padding: 0.4rem 1.2rem;
+    border: none;
+    border-radius: 20px;
+    margin-bottom: 1rem;
+    cursor: default;
+    display: inline-flex;
+    align-items: center;
+  }
+  
+  .globe {
+    margin-left: 8px;
+  }
+  
+  .home-text h1 {
+    font-size: 2.5rem;
+    color: #0f2e2e;
+    margin-bottom: 1rem;
+    font-weight: 700;
+    text-align: left;
+  }
+  
+  .highlight {
+    color: #fbb03b;
+  }
+  
+  .home-text p {
+    color: #555;
+    font-size: 1rem;
+    line-height: 1.6;
+  }
+  
+  .home-images {
+  display: flex;
+  flex-direction: row;
+  gap: 1.0rem;
+  flex-wrap: wrap;
+  justify-content: flex-start; /* Align images to the start */
+  flex: 1 1 45%;
+}
+
+.home-images img:nth-child(2) {
+    margin-top: 50px; /* Adjust this value to control the drop */
+  }
+  
+  .home-image {
+    width: 170px;
+    height: 250px;
+    object-fit: cover;
+    border-radius: 35px;
+    border: 2px solid #fbb03b;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  }
+
+    /* Services Section */
+    .services-section2 {
+        padding: 40px;
+        background-color: rgb(255, 255, 255);
+        text-align: center;
+      }
+      
+      .services-section2 h3 {
+        font-size: 30px;
+        margin-bottom: 40px;
+        color: #FAA935;
+        
+      }
+      
+      .services-grid2 {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 30px;
+      }
+      
+      .service-card2 {
+        background-color: rgb(255, 255, 255);
+        padding: 25px;
+        border-radius: 16px;
+        box-shadow: 0 4px 12px rgba(255, 111, 0, 0.3);
+        width: 300px;
+        text-align: center;
+        transition: transform 0.2s ease;
+      }
+      
+      .service-card2:hover {
+        transform: translateY(-5px);
+      }
+    
+      .card-content {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+      }
+      
+      .service-img {
+        width: 60px;
+        height: 60px;
+        object-fit: cover;
+        border-radius: 8px;
+        margin-bottom: 0px;
+      }
+      
+      .service-card2 h4 {
+        font-size: 18px;
+        color: #333;
+        margin: 0;
+        white-space: nowrap;
+        
+      }
+    
+      .card-subtext {
+        font-size: 14px;
+        color: #6E7070;
+        margin-top: 8px;
+        line-height: 1.4;
+        text-align:left;
+      }
+
+      .places-section {
+        /*margin-top: 5rem;*/
+        padding: 3rem 2rem;
+        background-color: #fffefb;
+        text-align: left;
+      }
+      
+      .explore-button {
+    background-color: #fbb03b;
+    color: #ffffff;
+    font-family: 'Cursive',serif;
+    font-style:italic;
+    font-size: 1.1rem;
+    padding: 0.4rem 1.2rem;
+    border: none;
+    border-radius: 20px;
+    margin-bottom: 1rem;
+    cursor: default;
+    display: inline-flex;
+    align-items: center;
+      }
+      
+      .places-section h3 {
+        font-size: 2rem;
+        color: #0f2e2e;
+        margin-bottom: 2rem;
+      }
+      
+      .places-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 1.5rem;
+      }
+      
+      .place-card {
+        position: relative;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+      }
+      
+      .place-card img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+        transition: transform 0.3s ease;
+      }
+      
+      .place-card:hover img {
+        transform: scale(1.05);
+      }
+      
+      .place-overlay {
+        position: absolute;
+        bottom: 0;
+        width: 100%;
+        padding: 1rem;
+        background: linear-gradient(to top, rgba(0, 0, 0, 0.6), transparent);
+        color: #fff;
+        text-align: center;
+      }
+      
+      .place-overlay h4 {
+        font-family: 'Cursive', serif;
+        font-size: 1.2rem;
+        margin: 0;
+        margin-bottom: 250px;
+      }
+      .place-overlay h5 {
+        font-family: 'Cursive', serif;
+        font-size: 1.2rem;
+        margin: 0;
+        margin-bottom: 130px;
+      }
+      .place-overlay h6 {
+        font-family: 'Cursive', serif;
+        font-size: 1.2rem;
+        margin: 0;
+        margin-bottom: 75px;
+      }
+
+      .place-overlay p{
+        margin: 0.2rem 0 0;
+        font-size: 0.9rem;
+        
+      }
+
+     
+      
+      /* Optional: card variations */
+      .place-card.tall {
+        grid-row: span 2;
+      }
+      
+      .place-card.wide {
+        grid-column: span 2;
+      }
+
+      .place-card.custom-height img {
+        height: 160px; /* Adjust this to whatever looks perfect */
+        object-fit: cover;
+      }
+      .fans-love-section {
+        padding: 3rem 2rem;
+        text-align: left;
+      }
+      
+      .tag-btn {
+        background-color: #f7a824;
+        color: white;
+        font-style: italic;
+        border: none;
+        /*padding: 5px 15px;*/
+        border-radius: 999px;
+        font-family: 'Cursive', serif;
+        /*font-size: 1rem;*/
+        margin-bottom: 10px;
+        font-size: 1.1rem;
+        padding: 0.4rem 1.2rem;
+      }
+      
+      .fans-love-section h3 {
+        color: #07221b;
+        margin-bottom: 2rem;
+        font-size: 1.6rem;
+      }
+      
+      .testimonial-grid {
+        display: flex;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 2rem;
+      }
+      
+      .testimonial-card {
+        flex: 1;
+        min-width: 250px;
+        max-width: 350px;
+        margin: 0 auto;
+      }
+      
+      .testimonial-text {
+        font-size: 0.95rem;
+        color: #333;
+        margin-bottom: 1rem;
+        line-height: 1.5;
+      }
+      
+      .testimonial-user {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        justify-content: center;
+        justify-content:flex-start;
+        
+      }
+      
+      .user-img-placeholder {
+        width: 50px;
+        height: 50px;
+        background-color: #d3d3d3;
+        border-radius: 50%;
+        
+      }
+      
+      .user-name {
+        font-weight: bold;
+        color: #07221b;
+        margin-bottom: 2px;
+      }
+      
+      .user-role {
+        font-size: 0.85rem;
+        color: gray;
+      }
+      
