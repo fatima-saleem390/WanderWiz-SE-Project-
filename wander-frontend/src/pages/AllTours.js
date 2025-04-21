@@ -13,7 +13,7 @@ const AllTours = () => {
       .catch(error => console.error('Error fetching tours:', error));
   }, []);
 
-  return (
+  return(
     <div className="all-tours-page">
       {/* Banner Section with text overlay */}
       <div className="banner-container">
