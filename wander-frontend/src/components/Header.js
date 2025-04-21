@@ -1,14 +1,20 @@
 // src/components/Header.js
 import React from 'react';
-import { NavLink } from 'react-router-dom'; // Use NavLink for active links
-import '../assets/logo.png'; 
-import '../components/Header.css';
+import { NavLink, useNavigate } from 'react-router-dom';
+import logo from '../assets/logo.png'; 
+import './Header.css';
 
 const Header = () => {
+  const navigate = useNavigate();
+
+  const handlePlanTripClick = () => {
+    navigate('/plan-trip');
+  };
+
   return (
     <header className="header">
       <div className="logo">
-        <img src={require('../assets/logo.png')} alt="WanderWiz Logo" />
+        <img src={logo} alt="WanderWiz Logo" />
       </div>
       <nav className="nav-links">
         <NavLink 
@@ -35,7 +41,7 @@ const Header = () => {
         >
           Login
         </NavLink>
-        <button className="post-btn">Plan a trip</button>
+        <button className="post-btn" onClick={handlePlanTripClick}>Plan a trip</button>
       </nav>
     </header>
   );
