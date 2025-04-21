@@ -8,21 +8,22 @@ import './TourDetails.css';
 const TourDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [cityTitle, setCityTitle] = useState('');
+  const [cityName, setCityName] = useState('');
 
   useEffect(() => {
-    const fetchCityTitle = async () => {
+    const fetchCityName = async () => {
       try {
-        const res = await fetch(`http://localhost:5000/api/city/${id}`);
-        const data = await res.json();
-        setCityTitle(data.title);
-      } catch (err) {
-        console.error('Failed to load city:', err);
-        setCityTitle('City Not Found');
+        const response = await fetch(`http://localhost:5000/api/city/${id}`);
+        if (!response.ok) throw new Error('City not found');
+        const data = await response.json();
+        setCityName(data.cityName);
+      } catch (error) {
+        console.error('Error fetching city name:', error.message);
+        setCityName('City Not Found');
       }
     };
 
-    fetchCityTitle();
+    fetchCityName();
   }, [id]);
 
   const handleNavigate = (category) => {
@@ -31,7 +32,7 @@ const TourDetails = () => {
 
   return (
     <div className="tour-details">
-      <h1>{cityTitle}</h1>
+      <h1>{cityName}</h1>
       <div className="card-grid">
         <div className="card" onClick={() => handleNavigate('historical-places')}>
           <img src={historicalImg} alt="Historical Places" />
