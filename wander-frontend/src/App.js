@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'; // ✅ add Navigate
 import Header from './components/Header';
 import Footer from './components/Footer';
 import Home from './pages/Home';
@@ -11,7 +11,7 @@ import TourDetails from './pages/TourDetails';
 import HistoricalPlaces from './pages/HistoricalPlaces';
 import Restaurants from './pages/Restaurants';
 import Hotels from './pages/Hotels';
-import Register from './pages/Register'; // 👈 import the Register page
+import Register from './pages/Register';
 
 function App() {
   return (
@@ -19,14 +19,13 @@ function App() {
       <Header />
       <main>
         <Routes>
-          <Route path="/" element={<Home />} />
+          <Route path="/" element={<Navigate to="/register" />} /> {/* ✅ redirect to register */}
+          <Route path="/home" element={<Home />} />
           <Route path="/about" element={<About />} />
           <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} /> {/* 👈 added Register route */}
+          <Route path="/register" element={<Register />} />
           <Route path="/listing" element={<AllTours />} />
           <Route path="/plan-trip" element={<PlanTrip />} />
-          
-          {/* Tour Details Route */}
           <Route path="/tour-details/:id" element={<TourDetails />} />
           <Route path="/tour-details/:id/historical-places" element={<HistoricalPlaces />} />
           <Route path="/tour-details/:id/restaurants" element={<Restaurants />} />
