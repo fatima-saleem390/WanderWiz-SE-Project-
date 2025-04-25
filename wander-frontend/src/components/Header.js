@@ -41,6 +41,12 @@ const Header = () => {
         >
           Login
         </NavLink>
+        <NavLink 
+          to="/register" 
+          className={({ isActive }) => isActive ? 'nav-link active-link' : 'nav-link'}
+        >
+          Register
+        </NavLink>
         <button className="post-btn" onClick={handlePlanTripClick}>Plan a trip</button>
       </nav>
     </header>

@@ -11,6 +11,7 @@ import TourDetails from './pages/TourDetails';
 import HistoricalPlaces from './pages/HistoricalPlaces';
 import Restaurants from './pages/Restaurants';
 import Hotels from './pages/Hotels';
+import Register from './pages/Register'; // 👈 import the Register page
 
 function App() {
   return (
@@ -21,6 +22,7 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/about" element={<About />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} /> {/* 👈 added Register route */}
           <Route path="/listing" element={<AllTours />} />
           <Route path="/plan-trip" element={<PlanTrip />} />
           
