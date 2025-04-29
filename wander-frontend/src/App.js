@@ -1,3 +1,4 @@
+// src/App.js
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Header from './components/Header';
@@ -8,9 +9,12 @@ import Login from './pages/Login';
 import AllTours from './pages/AllTours';
 import PlanTrip from './pages/PlanTrip';
 import TourDetails from './pages/TourDetails';
-import HistoricalPlaces from './pages/HistoricalPlaces';
-import Restaurants from './pages/Restaurants';
-import Hotels from './pages/Hotels';
+import HistoricalPlaces from './pages/HistoricalPlaces';  // Import HistoricalPlaces page
+import Restaurants from './pages/Restaurants';            // Import Restaurants page
+import Hotels from './pages/Hotels';                      // Import Hotels page
+import HistoricalPlaceDetail from './pages/HistoricalPlaceDetail';  // Import HistoricalPlaceDetail component
+import RestaurantDetail from './pages/RestaurantDetail';
+import HotelDetail from './pages/HotelDetail';
 
 function App() {
   return (
@@ -26,9 +30,16 @@ function App() {
           
           {/* Tour Details Route */}
           <Route path="/tour-details/:id" element={<TourDetails />} />
+          
+          {/* Nested Routes for each category (Historical Places, Restaurants, Hotels) */}
           <Route path="/tour-details/:id/historical-places" element={<HistoricalPlaces />} />
           <Route path="/tour-details/:id/restaurants" element={<Restaurants />} />
           <Route path="/tour-details/:id/hotels" element={<Hotels />} />
+          
+          {/* Dynamic Route for Historical Place Details */}
+          <Route path="/tour-details/:id/historical-places/:place" element={<HistoricalPlaceDetail />} />
+          <Route path="/tour-details/:id/restaurants/:restaurant" element={<RestaurantDetail />} />
+          <Route path="/tour-details/:id/hotels/:hotel" element={<HotelDetail />} />
         </Routes>
       </main>
       <Footer />

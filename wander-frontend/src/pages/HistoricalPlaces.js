@@ -1,42 +1,44 @@
+// src/pages/HistoricalPlaces.js
 import React, { useEffect, useState } from 'react';
+import { useParams, Link } from 'react-router-dom';
 import axios from 'axios';
+import './CategoryPage.css';
 
-const HistoricalPlaces = ({ cityId }) => {
-  const [cityData, setCityData] = useState(null);
+const HistoricalPlaces = () => {
+  const { id } = useParams();
+  const [places, setPlaces] = useState([]);
+  const [city, setCity] = useState("");
 
   useEffect(() => {
-    const fetchCityData = async () => {
-      try {
-        const response = await axios.get(`http://localhost:5000/api/city/${cityId}`);
-        setCityData(response.data);
-      } catch (error) {
-        console.error('Error fetching city data:', error);
-      }
-    };
-
-    fetchCityData();
-  }, [cityId]);
-
-  if (!cityData) return <div>Loading...</div>;
+    axios.get(`http://localhost:5000/api/tours/${id}`)
+      .then(response => {
+        setPlaces(response.data.historicalPlaces);
+        setCity(response.data.title);
+      })
+      .catch(error => console.error('Error fetching historical places:', error));
+  }, [id]);
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-4">
-      {cityData.historicalPlaces.map((place, index) => (
-        <div key={index} className="bg-white shadow-lg rounded-2xl overflow-hidden">
-          <img
-            src={`/images/${cityData.image}`}
-            alt={place}
-            className="w-full h-48 object-cover"
-          />
-          <div className="p-4">
-            <h2 className="text-xl font-semibold">{place.split('(')[0].trim()}</h2>
-            <p className="text-sm text-gray-600">
-              {place.match(/\((.*?)\)/)?.[1] || cityData.location}
-            </p>
-            <p className="mt-2 text-yellow-500 font-bold">⭐ {cityData.rating}</p>
-          </div>
-        </div>
-      ))}
+    <div className="category-container">
+      <h2>Historical Places in {city}</h2>
+      <div className="category-grid">
+        {places.length === 0 ? (
+          <p>No historical places found.</p>
+        ) : (
+          places.map((place, index) => {
+            const name = typeof place === 'string' ? place : place.name;
+            return (
+              <Link
+                key={index}
+                to={`/tour-details/${id}/historical-places/${encodeURIComponent(name)}`}
+                className="category-card"
+              >
+                {name}
+              </Link>
+            );
+          })
+        )}
+      </div>
     </div>
   );
 };

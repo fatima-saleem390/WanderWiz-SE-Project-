@@ -1,27 +1,22 @@
 import React, { useEffect, useState } from 'react';
 import TourCard from '../components/TourCard';
 import bannerImg from '../assets/Banner.jpg';
-import './AllTours.css'; // Optional: for custom styling
+import './AllTours.css';
 import axios from 'axios';
 
 const AllTours = () => {
   const [tours, setTours] = useState([]);
 
   useEffect(() => {
-    axios.get('http://localhost:5000/api/tours') // your backend endpoint
+    axios.get('http://localhost:5000/api/tours')
       .then(response => setTours(response.data))
       .catch(error => console.error('Error fetching tours:', error));
   }, []);
 
-  return(
+  return (
     <div className="all-tours-page">
-      {/* Banner Section with text overlay */}
       <div className="banner-container">
-        <img
-          src={bannerImg}
-          alt="Banner"
-          className="banner"
-        />
+        <img src={bannerImg} alt="Banner" className="banner" />
         <div className="banner-text">
           <h1>All Tours</h1>
         </div>

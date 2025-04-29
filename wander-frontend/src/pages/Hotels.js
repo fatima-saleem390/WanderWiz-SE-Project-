@@ -1,37 +1,43 @@
-// Hotels.js
+// src/pages/Hotels.js
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
+import axios from 'axios';
+import './CategoryPage.css';
 
 const Hotels = () => {
   const { id } = useParams();
   const [hotels, setHotels] = useState([]);
+  const [city, setCity] = useState("");
 
   useEffect(() => {
-    // You can fetch hotel data for the city using the `id` from the API
-    // For now, we're using mock data.
-    const fetchHotels = async () => {
-      // Replace this with a real API call to fetch hotels
-      const mockHotels = [
-        { name: "Karachi Hotel", description: "Luxury hotel in Karachi." },
-        { name: "Lahore Continental", description: "5-star hotel in Lahore." },
-        { name: "Islamabad Suites", description: "Premium hotel in Islamabad." },
-      ];
-      setHotels(mockHotels);
-    };
-
-    fetchHotels();
+    axios.get(`http://localhost:5000/api/tours/${id}`)
+      .then(response => {
+        setHotels(response.data.hotels);
+        setCity(response.data.title);
+      })
+      .catch(error => console.error('Error fetching hotels:', error));
   }, [id]);
 
   return (
-    <div>
-      <h1>Hotels in City {id}</h1>
-      <div>
-        {hotels.map((hotel, index) => (
-          <div key={index} className="hotel-card">
-            <h3>{hotel.name}</h3>
-            <p>{hotel.description}</p>
-          </div>
-        ))}
+    <div className="category-container">
+      <h2>Hotels in {city}</h2>
+      <div className="category-grid">
+        {hotels.length === 0 ? (
+          <p>No hotels found.</p>
+        ) : (
+          hotels.map((hotel, index) => {
+            const name = typeof hotel === 'string' ? hotel : hotel.name;
+            return (
+              <Link
+                key={index}
+                to={`/tour-details/${id}/hotels/${encodeURIComponent(name)}`}
+                className="category-card"
+              >
+                {name}
+              </Link>
+            );
+          })
+        )}
       </div>
     </div>
   );
