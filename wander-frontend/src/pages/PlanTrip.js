@@ -1,12 +1,13 @@
 // src/pages/PlanTrip.js
 import React, { useState } from 'react';
 import { DateRange } from 'react-date-range';
+import { useNavigate } from 'react-router-dom';
 import Slider from 'rc-slider';
 import 'react-date-range/dist/styles.css';
 import 'react-date-range/dist/theme/default.css';
 import 'rc-slider/assets/index.css';
 import bannerImg from '../assets/Plan_Trip_Image.jpg';
-import './PlanTrip.css'; // Custom styles you'll define
+import './PlanTrip.css'; 
 
 const PlanTrip = () => {
   const [dateRange, setDateRange] = useState([
@@ -19,6 +20,9 @@ const PlanTrip = () => {
   const [transport, setTransport] = useState('');
   const [accommodation, setAccommodation] = useState('');
   const [notes, setNotes] = useState('');
+  const [itinerary, setItinerary] = useState(null);
+
+  const navigate = useNavigate();
 
   const handleCheckbox = (e) => {
     const value = e.target.value;
@@ -27,7 +31,7 @@ const PlanTrip = () => {
     );
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const formData = {
       dateRange: dateRange[0],
       budget,
@@ -36,10 +40,27 @@ const PlanTrip = () => {
       transport,
       accommodation,
       notes,
+      people,
     };
-    console.log(formData);
-    alert('Trip plan generated!');
+  
+    try {
+      const response = await fetch('http://localhost:5000/api/plan-trip', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
+  
+      const data = await response.json();
+      console.log('Generated Itinerary:', itinerary);
+      
+      navigate('/itinerary', { state: { itinerary: data } });
+    } catch (error) {
+      console.error('Error generating trip:', error);
+      alert('Failed to generate trip. Please try again.');
+    }
   };
+  
+  
 
   return (
     <div className="plan-trip-container">

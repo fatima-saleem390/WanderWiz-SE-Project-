@@ -15,6 +15,7 @@ import Hotels from './pages/Hotels';                      // Import Hotels page
 import HistoricalPlaceDetail from './pages/HistoricalPlaceDetail';  // Import HistoricalPlaceDetail component
 import RestaurantDetail from './pages/RestaurantDetail';
 import HotelDetail from './pages/HotelDetail';
+import ItineraryPage from './pages/ItineraryPage';
 
 function App() {
   return (
@@ -27,6 +28,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/listing" element={<AllTours />} />
           <Route path="/plan-trip" element={<PlanTrip />} />
+          <Route path="/itinerary" element={<ItineraryPage />} />
           
           {/* Tour Details Route */}
           <Route path="/tour-details/:id" element={<TourDetails />} />

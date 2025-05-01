@@ -7,6 +7,9 @@ app.use(cors());
 app.use(express.json());
 
 // Other routes and logic...
+const planTripRoute = require('./routes/planTrip');
+app.use('/api', planTripRoute);
+
 
 // Sample tours data with reviews, historical places, restaurants, and hotels
 const tours = [
