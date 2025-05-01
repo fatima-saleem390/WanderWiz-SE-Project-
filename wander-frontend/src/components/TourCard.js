@@ -4,7 +4,7 @@ import './TourCard.css';
 
 const TourCard = ({ tour }) => {
   // Directly use the image URL from the backend
-  const imageSrc = tour.image || 'default.jpg';  // Fallback to 'default.jpg' if no image URL is provided
+  const imageSrc = tour.image;  // Fallback to 'default.jpg' if no image URL is provided
 
   const renderStars = (rating) => {
     const fullStars = Math.floor(rating);
