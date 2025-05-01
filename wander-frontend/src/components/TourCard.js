@@ -3,18 +3,8 @@ import { Link } from 'react-router-dom'; // Import Link for navigation
 import './TourCard.css';
 
 const TourCard = ({ tour }) => {
-  let imageSrc;
-
-  try {
-    imageSrc = require(`../assets/${tour.image}`);
-  } catch (err) {
-    try {
-      imageSrc = require(`../assets/default.jpg`);
-    } catch (fallbackErr) {
-      console.error('Default image not found. Please add default.jpg to assets.');
-      imageSrc = '';
-    }
-  }
+  // Directly use the image URL from the backend
+  const imageSrc = tour.image || 'default.jpg';  // Fallback to 'default.jpg' if no image URL is provided
 
   const renderStars = (rating) => {
     const fullStars = Math.floor(rating);
@@ -40,6 +30,7 @@ const TourCard = ({ tour }) => {
 
   return (
     <div className="tour-card">
+      {/* Display the image using the URL from the backend */}
       <img src={imageSrc} alt={tour.title} />
       <h3>
         <Link to={`/tour-details/${tour.id}`} className="city-link">
