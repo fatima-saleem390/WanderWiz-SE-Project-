@@ -1,10 +1,24 @@
 const express = require('express');
 const cors = require('cors');
 const app = express();
+const mongoose = require('mongoose');
+const dotenv = require('dotenv');
+const authRoutes = require('./routes/auth'); // import the registration route
 
 // Middleware
 app.use(cors());
 app.use(express.json());
+
+dotenv.config(); // load .env file
+
+// Connect to MongoDB
+mongoose.connect(process.env.DB_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+}).then(() => console.log('✅ Connected to MongoDB'))
+  .catch(err => console.error('❌ DB connection error:', err));
+
+app.use('/api/auth', authRoutes); // route for /api/auth/register
 
 // Sample tours data with reviews, historical places, restaurants, and hotels
 const tours = [

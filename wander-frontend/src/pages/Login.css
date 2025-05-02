@@ -1,0 +1,110 @@
+/* Overall page styling */
+body {
+    margin: 0;
+    font-family: 'Poppins', sans-serif;
+    background-color: #ffffff;
+  }
+  
+  /* Container */
+  .login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 30px;
+    min-height: 80vh;
+    gap: 30px;
+  }
+  
+  /* Left image */
+  .login-image img {
+    width: 350px;
+    height: auto;
+    border-radius: 20px;
+    object-fit: cover;
+    margin-top: 80px;
+  }
+  
+  /* Right form */
+  .login-form {
+    max-width: 400px;
+    width: 100%;
+  }
+  
+  /* Title */
+  .login-form h2 {
+    font-size: 45px;
+    color: #ff9900;
+    margin-bottom: 5px;
+    font-weight: 700;
+    text-align: center;
+    font-family: 'Georgia', serif; /* example: Georgia font */
+  }
+  
+  /* Subtitle */
+  .login-form p {
+    font-size: 14px;
+    color: #8e8e8e;
+    margin-bottom: 20px;
+    text-align: center;
+    margin-top: 5px;
+  }
+  
+  /* Form */
+  .login-form form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  /* Inputs */
+  .login-form input {
+    padding: 12px 15px;
+    border: 1px solid #ff9900;
+    border-radius: 9px;
+    font-size: 14px;
+    width: 100%;
+  }
+  
+  /* Button */
+  .login-form button {
+    background-color: #ff9900;
+    color: white;
+    padding: 12px;
+    border: none;
+    border-radius: 9px;
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 16px;
+    margin-top: 10px;
+  }
+  
+  /* Register link */
+  .register-link {
+    font-size: 12px;
+    text-align: center;
+    margin-top: 10px;
+    color: #8e8e8e;
+  }
+  
+  .register-link a {
+    color: #ff9900;
+    font-weight: 600;
+    text-decoration: none;
+    margin-left: 5px;
+  }
+  
+  /* Decorative images */
+  .buildings-image {
+    position: absolute;
+    bottom: -30px;
+    right: 240px;
+    width: 150px;
+  }
+  
+  .mosque-vector {
+    position: absolute;
+    bottom: -30px;
+    right: 560px;
+    width: 130px;
+  }
+  
