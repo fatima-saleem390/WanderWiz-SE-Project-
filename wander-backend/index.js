@@ -6,6 +6,10 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// Other routes and logic...
+const planTripRoute = require('./routes/planTrip');
+app.use('/api', planTripRoute);
+
 // MongoDB Connection
 mongoose.connect('mongodb://localhost:27017/wanderwiz', {
   useNewUrlParser: true,
