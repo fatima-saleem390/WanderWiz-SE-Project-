@@ -1,51 +1,55 @@
 const express = require('express');
+const router = express.Router();
 
-module.exports = (db) => {
-  const router = express.Router();
-  const tours = db.collection('tours');
+router.post('/plan-trip', (req, res) => {
+  const {
+    dateRange,
+    budget,
+    interests,
+    pace,
+    transport,
+    accommodation,
+    notes,
+    people
+  } = req.body;
 
-  router.post('/plan-trip', async (req, res) => {
-    const {
-      dateRange, budget, interests, pace,
-      transport, accommodation, notes, people
-    } = req.body;
+  const totalDays = Math.ceil(
+    (new Date(dateRange.endDate) - new Date(dateRange.startDate)) / (1000 * 60 * 60 * 24)
+  ) + 1;
 
-    const totalDays = Math.ceil(
-      (new Date(dateRange.endDate) - new Date(dateRange.startDate)) / (1000 * 60 * 60 * 24)
-    ) + 1;
+  const totalBudget = budget[1] - budget[0];
+  const budgetPerDay = Math.floor(totalBudget / totalDays);
 
-    const totalBudget = budget[1] - budget[0];
-    const budgetPerDay = Math.floor(totalBudget / totalDays);
+  const plan = [];
 
-    // Fetch and filter tours from DB
-    try {
-      const allTours = await tours.find({}).toArray();
+  for (let day = 1; day <= totalDays; day++) {
+    const dayPlan = {
+      day,
+      activities: [],
+      meals: [],
+      budget: budgetPerDay,
+      notes: `Plan based on ${pace} pace and interests: ${interests.join(', ')}`,
+    };
 
-      const matchedTours = allTours.filter(tour => {
-        return interests.some(interest => tour.tags?.includes(interest.trim()));
-      });
-
-      const plan = [];
-      for (let day = 1; day <= totalDays; day++) {
-        const tour = matchedTours[day % matchedTours.length]; // just rotate
-
-        const dayPlan = {
-          day,
-          activities: [tour?.name || 'Explore local area'],
-          meals: [accommodation.includes('Hotel') ? 'Hotel buffet' : 'Local diner'],
-          budget: budgetPerDay,
-          notes: `Plan based on ${pace} pace and interests: ${interests.join(', ')}`,
-        };
-
-        plan.push(dayPlan);
-      }
-
-      res.json({ totalDays, budget: totalBudget, people, plan });
-    } catch (err) {
-      console.error(err);
-      res.status(500).json({ error: 'Failed to generate trip plan' });
+    if (interests.includes(' Adventure 🌋')) {
+      dayPlan.activities.push('Outdoor adventure');
+    } else if (interests.includes(' Culture 🏛️')) {
+      dayPlan.activities.push('Visit museum or temple');
+    } else {
+      dayPlan.activities.push('Explore local area');
     }
-  });
 
-  return router;
-};
+    dayPlan.meals.push(accommodation.includes('Hotel') ? 'Hotel buffet' : 'Local diner');
+
+    plan.push(dayPlan);
+  }
+
+  res.json({
+    totalDays,
+    budget: totalBudget,
+    people,
+    plan,
+  });
+});
+
+module.exports = router;

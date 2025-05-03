@@ -1,6 +1,11 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
+const dotenv = require('dotenv');
+const authRoutes = require('./routes/auth');
+const planTripRoute = require('./routes/planTrip');
+
+dotenv.config();
 
 const app = express();
 app.use(cors());
@@ -15,7 +20,9 @@ mongoose.connect(atlasUri, {
 })
 .then(() => console.log("✅ Connected to MongoDB Atlas"))
 .catch(err => console.error("❌ MongoDB connection error:", err));
-
+// Auth and Trip routes
+app.use('/api/auth', authRoutes);
+app.use('/api', planTripRoute);
 // Review Schema for Restaurants and Hotels
 const reviewSchema = new mongoose.Schema({
   username: String,
