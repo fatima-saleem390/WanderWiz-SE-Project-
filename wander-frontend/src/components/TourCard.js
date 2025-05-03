@@ -1,10 +1,9 @@
 import React from 'react';
-import { Link } from 'react-router-dom'; // Import Link for navigation
+import { Link } from 'react-router-dom';
 import './TourCard.css';
 
 const TourCard = ({ tour }) => {
-  // Directly use the image URL from the backend
-  const imageSrc = tour.image;  // Fallback to 'default.jpg' if no image URL is provided
+  const imageSrc = tour.image;
 
   const renderStars = (rating) => {
     const fullStars = Math.floor(rating);
@@ -30,20 +29,15 @@ const TourCard = ({ tour }) => {
 
   return (
     <div className="tour-card">
-      {/* Display the image using the URL from the backend */}
       <img src={imageSrc} alt={tour.title} />
       <h3>
         <Link to={`/tour-details/${tour.id}`} className="city-link">
-          {tour.title} {/* City name wrapped in Link */}
+          {tour.title}
         </Link>
       </h3>
       <div className="rating-review">
-        <div className="rating">
-          {renderStars(tour.rating)} {/* Just stars */}
-        </div>
-        <div className="review-count">
-          ({tour.reviews}) {/* Only reviews count */}
-        </div>
+        <div className="rating">{renderStars(tour.rating)}</div>
+        <div className="review-count">({tour.reviews})</div>
       </div>
     </div>
   );
