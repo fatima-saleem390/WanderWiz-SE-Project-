@@ -1,3 +1,4 @@
+/* Container for the whole page */
 .container {
   max-width: 900px;
   margin: 2rem auto;
@@ -62,10 +63,9 @@
 }
 
 .stars svg {
-  fill: #f97316 !important; /* Ensure the color is applied */
+  fill: #f97316 !important;
   margin-right: 3px;
 }
-
 
 .review-text {
   margin-left: 0.5rem;
@@ -128,7 +128,7 @@
   background-color: #ef4444;
 }
 
-/* Review Section Styles */
+/* Review Section */
 .review-card {
   background-color: #f9f9f9;
   border-radius: 8px;
@@ -181,12 +181,66 @@
   font-size: 14px;
   color: #333;
 }
-/* Style for the filled star (orange) */
+
+/* Stars */
 .filled-star {
-  color: #f97316; /* Orange color */
+  color: #f97316;
 }
 
-/* Style for the empty star (light gray) */
 .empty-star {
-  color: #e5e7eb; /* Light grey color */
+  color: #e5e7eb;
+}
+
+/* Review Form Container */
+.review-form {
+  background-color: #fefefe;
+  padding: 1rem;
+  margin-top: 1rem;
+  border-radius: 10px;
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.05);
+}
+
+/* Form Fields */
+.review-form input,
+.review-form textarea,
+.review-form select {
+  width: 100%;
+  padding: 10px;
+  margin: 6px 0;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 14px;
+  background-color: #f9fafb;
+}
+
+.review-form input:focus,
+.review-form textarea:focus {
+  border-color: #f97316;
+}
+
+/* Submit Button Larger and Centered */
+.review-form button {
+  padding: 12px 24px; /* Increased padding */
+  background-color: #f87171;
+  color: white;
+  font-weight: bold;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 16px; /* Increased font size */
+  display: block;
+  margin: 1rem auto 0;
+  transition: background-color 0.3s ease;
+}
+
+.review-form button:hover {
+  background-color: #ef4444;
+}
+
+
+/* Textarea */
+.review-form textarea {
+  min-height: 100px;
+  resize: vertical;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }

@@ -6,10 +6,6 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Other routes and logic...
-const planTripRoute = require('./routes/planTrip');
-app.use('/api', planTripRoute);
-
 // MongoDB Connection
 mongoose.connect('mongodb://localhost:27017/wanderwiz', {
   useNewUrlParser: true,
@@ -18,9 +14,55 @@ mongoose.connect('mongodb://localhost:27017/wanderwiz', {
 .then(() => console.log("✅ MongoDB connected"))
 .catch(err => console.error("❌ MongoDB connection error:", err));
 
-// Define a flexible schema (we'll insert raw tour objects)
-const tourSchema = new mongoose.Schema({}, { strict: false });
-const Tour = mongoose.model('Tour', tourSchema, 'tours'); // collection name: tours
+// Review Schema for Restaurants and Hotels
+const reviewSchema = new mongoose.Schema({
+  username: String,
+  review: String,
+  rating: Number,
+});
+
+// Restaurant Schema
+const restaurantSchema = new mongoose.Schema({
+  name: String,
+  image: String,
+  location: String,
+  description: String,
+  userReviews: [reviewSchema],
+  rating: Number, // Optional: average rating
+});
+
+// Hotel Schema
+const hotelSchema = new mongoose.Schema({
+  name: String,
+  image: String,
+  location: String,
+  description: String,
+  userReviews: [reviewSchema],
+  rating: Number, // Optional: average rating
+});
+
+// Historical Place Schema
+const historicalPlaceSchema = new mongoose.Schema({
+  name: String,
+  image: String,
+  description: String,
+  location: String,
+  rating: Number,
+  userReviews: [reviewSchema],
+});
+
+// Tour Schema
+const tourSchema = new mongoose.Schema({
+  id: Number,
+  name: String,
+  description: String,
+  image: String,
+  historicalPlaces: [historicalPlaceSchema],
+  restaurants: [restaurantSchema],
+  hotels: [hotelSchema],
+});
+
+const Tour = mongoose.model('Tour', tourSchema); // Tour model
 
 // Route: Get all tours
 app.get('/api/tours', async (req, res) => {
@@ -61,7 +103,7 @@ app.get('/api/tours/:id/historical-places/:place', async (req, res) => {
       description: historicalPlace.description || "No description available",
       image: historicalPlace.image,
       address: historicalPlace.location || 'No address available',
-      reviews: historicalPlace.reviews || 0,
+      reviews: historicalPlace.userReviews.length || 0,
       rating: historicalPlace.rating || 4.8,
       userReviews: historicalPlace.userReviews || []
     });
@@ -87,7 +129,7 @@ app.get('/api/tours/:id/restaurants/:restaurant', async (req, res) => {
       description: restaurantDetail.description || "No description available",
       image: restaurantDetail.image,
       address: restaurantDetail.location || 'No address available',
-      reviews: restaurantDetail.reviews || 0,
+      reviews: restaurantDetail.userReviews.length || 0,
       rating: restaurantDetail.rating || 4.8,
       userReviews: restaurantDetail.userReviews || []
     });
@@ -113,7 +155,7 @@ app.get('/api/tours/:id/hotels/:hotel', async (req, res) => {
       description: hotelDetail.description || "No description available",
       image: hotelDetail.image,
       address: hotelDetail.location || 'No address available',
-      reviews: hotelDetail.reviews || 0,
+      reviews: hotelDetail.userReviews.length || 0,
       rating: hotelDetail.rating || 4.8,
       userReviews: hotelDetail.userReviews || []
     });
@@ -122,7 +164,55 @@ app.get('/api/tours/:id/hotels/:hotel', async (req, res) => {
   }
 });
 
-// Start server
+app.post('/api/tours/:id/historical-places/:place/userReviews', async (req, res) => {
+  const { id, place } = req.params;
+  const { username, review, rating } = req.body;
+
+  try {
+    const tour = await Tour.findOne({ id: parseInt(id) }); // fixed line
+    if (!tour) return res.status(404).json({ message: 'Tour not found' });
+
+    const historicalPlace = tour.historicalPlaces.find(
+      p => p.name === decodeURIComponent(place)
+    );
+    if (!historicalPlace) return res.status(404).json({ message: 'Historical place not found' });
+
+    historicalPlace.userReviews.push({ username, review, rating });
+    await tour.save();
+
+    res.status(201).json({ message: 'Review added' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+app.post('/api/tours/:id/hotels/:hotel/userReviews', async (req, res) => {
+  const { id, hotel } = req.params;  // Changed from hotelName to hotel
+  const { username, review, rating } = req.body;
+
+  console.log(`Decoded hotel name: ${decodeURIComponent(hotel)}`);  // Log the decoded hotel name
+
+  try {
+    const tour = await Tour.findOne({ id: parseInt(id) });
+    if (!tour) return res.status(404).json({ message: 'Tour not found' });
+
+    const foundHotel = tour.hotels.find(
+      h => h.name.toLowerCase() === decodeURIComponent(hotel).toLowerCase()
+    );
+    if (!foundHotel) return res.status(404).json({ message: 'Hotel not found' });
+
+    foundHotel.userReviews.push({ username, review, rating });
+    await tour.save();
+
+    res.status(201).json({ message: 'Review added' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`);
