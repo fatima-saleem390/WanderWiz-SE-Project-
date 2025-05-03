@@ -1,52 +1,85 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import historicalImg from '../assets/historical.jpg';
+import './TourDetails.css';
+
+import historicalPlaceImg from '../assets/historical-place.jpg';
 import restaurantImg from '../assets/restaurant.jpg';
 import hotelImg from '../assets/hotel.jpg';
-import './TourDetails.css';
 
 const TourDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [cityName, setCityName] = useState('');
+  const [city, setCity] = useState(null);
+
+  const images = {
+    'historical-places': historicalPlaceImg,
+    'restaurants': restaurantImg,
+    'hotels': hotelImg,
+  };
 
   useEffect(() => {
-    const fetchCityName = async () => {
+    // Fetch city data by ID from the backend
+    const fetchCity = async () => {
       try {
-        const response = await fetch(`http://localhost:5000/api/city/${id}`);
-        if (!response.ok) throw new Error('City not found');
+        const response = await fetch(`http://localhost:5000/api/tours/${id}`);
         const data = await response.json();
-        setCityName(data.cityName);
+        setCity(data);  // Store the city data in state
       } catch (error) {
-        console.error('Error fetching city name:', error.message);
-        setCityName('City Not Found');
+        console.error('Error fetching city details:', error);
       }
     };
 
-    fetchCityName();
+    fetchCity();
   }, [id]);
 
-  const handleNavigate = (category) => {
-    navigate(`/tour-details/${id}/${category}`);
+  const handleNavigate = (type) => {
+    navigate(`/tour-details/${id}/${type}`);
   };
 
   return (
-    <div className="tour-details">
-      <h1>{cityName}</h1>
-      <div className="card-grid">
-        <div className="card" onClick={() => handleNavigate('historical-places')}>
-          <img src={historicalImg} alt="Historical Places" />
-          <h3>Historical Places</h3>
-        </div>
-        <div className="card" onClick={() => handleNavigate('restaurants')}>
-          <img src={restaurantImg} alt="Restaurants" />
-          <h3>Restaurants</h3>
-        </div>
-        <div className="card full-width" onClick={() => handleNavigate('hotels')}>
-          <img src={hotelImg} alt="Hotels" />
-          <h3>Hotels</h3>
-        </div>
-      </div>
+    <div className="tour-details-container">
+      {/* Display loading text until city data is fetched */}
+      {city ? (
+        <>
+          {/* City Name and Image */}
+          <div className="city-header">
+            <h1>{city.title}</h1>
+          </div>
+
+          {/* Option Cards */}
+          <div className="option-cards">
+            <div className="option-card" onClick={() => handleNavigate('historical-places')}>
+              <img
+                src={images['historical-places']}
+                alt="Historical Places"
+                className="card-image"
+              />
+              <h3>Historical Places</h3>
+            </div>
+            <div className="option-card" onClick={() => handleNavigate('restaurants')}>
+              <img
+                src={images['restaurants']}
+                alt="Restaurants"
+                className="card-image"
+              />
+              <h3>Restaurants</h3>
+            </div>
+          </div>
+
+          <div className="option-cards" style={{ justifyContent: 'center', marginTop: '20px' }}>
+            <div className="option-card" onClick={() => handleNavigate('hotels')}>
+              <img
+                src={images['hotels']}
+                alt="Hotels"
+                className="card-image"
+              />
+              <h3>Hotels</h3>
+            </div>
+          </div>
+        </>
+      ) : (
+        <p>Loading city details...</p>
+      )}
     </div>
   );
 };
