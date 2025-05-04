@@ -73,9 +73,7 @@ const HistoricalPlaceDetail = () => {
     }
   };
 
-  const handleSave = () => {
-    alert("Saved to bookmarks (feature coming soon)!");
-  };
+ 
 
   if (loading) return <div className="container"><p>Loading...</p></div>;
   if (error) return <div className="container"><p>Error: {error}</p></div>;
@@ -186,8 +184,6 @@ const HistoricalPlaceDetail = () => {
               </form>
             </>
           )}
-
-          <button className="save-button" onClick={handleSave}>Save</button>
         </div>
       </div>
     </div>

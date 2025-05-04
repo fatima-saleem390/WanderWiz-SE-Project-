@@ -1,5 +1,4 @@
-// src/components/Footer.js
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import '../components/footer.css';
 
@@ -8,14 +7,50 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faYoutube, faInstagram, faTwitter, faFacebook } from '@fortawesome/free-brands-svg-icons';
 
 const Footer = () => {
+  const [email, setEmail] = useState('');
+  const [emailError, setEmailError] = useState('');
+
+  // Handle email input change
+  const handleEmailChange = (e) => {
+    setEmail(e.target.value);
+  };
+
+  // Validate email format
+  const validateEmail = (email) => {
+    const regex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
+    return regex.test(email);
+  };
+
+  // Handle form submission
+  const handleSubscribe = (e) => {
+    e.preventDefault();
+
+    if (validateEmail(email)) {
+      setEmailError('');
+      // Show pop-up on successful subscription
+      alert('Subscribed successfully! Check your inbox for updates.');
+      // You can add your actual subscription logic here, like API calls
+    } else {
+      
+      // Show pop-up for invalid email
+      alert('Please enter a valid email address.');
+    }
+  };
+
   return (
     <>
       <div className="subscribe-section">
         <div className="subscribe-left">
           <h3>Subscribe now to get useful traveling information</h3>
           <div className="subscribe-form">
-            <input type="email" placeholder="Enter your email" />
-            <button>Subscribe</button>
+            <input
+              type="email"
+              value={email}
+              onChange={handleEmailChange}
+              placeholder="Enter your email"
+            />
+            <button onClick={handleSubscribe}>Subscribe</button>
+            {emailError && <p className="error">{emailError}</p>}
           </div>
         </div>
         <div className="subscribe-image">
@@ -63,8 +98,8 @@ const Footer = () => {
 
           <div className="contact">
             <h4>Contact</h4>
-            <p>📍 Address: Lorem</p>
-            <p>📧 Email: xyz@gmail.com</p>
+            <p>📍 Address: WanderWiz</p>
+            <p>📧 Email: WanderWiz@gmail.com</p>
             <p>📞 Phone: 0900-000000</p>
           </div>
         </div>
