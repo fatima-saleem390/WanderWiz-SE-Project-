@@ -71,9 +71,13 @@ const TourCard = ({ tour }) => {
 
   return (
     <div className="tour-card">
-      <button className="bookmark-btn" onClick={handleBookmark}>
-        <FontAwesomeIcon icon={isBookmarked ? faBookmarkSolid : faBookmark} />
-      </button>
+      <button
+  className={`bookmark-btn ${isBookmarked ? 'bookmarked' : ''}`}
+  onClick={handleBookmark}
+>
+  <FontAwesomeIcon icon={isBookmarked ? faBookmarkSolid : faBookmark} />
+</button>
+
       <img src={imageSrc} alt={tour.title} />
       <h3>
         <Link to={`/tour-details/${tour.id}`} className="city-link">

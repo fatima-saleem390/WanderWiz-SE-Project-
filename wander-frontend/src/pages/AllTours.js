@@ -8,9 +8,10 @@ const AllTours = () => {
   const [tours, setTours] = useState([]);
 
   useEffect(() => {
-    axios.get('http://localhost:5000/api/tours')
-      .then(response => setTours(response.data))
-      .catch(error => console.error('Error fetching tours:', error));
+    axios
+      .get('http://localhost:5000/api/tours')
+      .then((response) => setTours(response.data))
+      .catch((error) => console.error('Error fetching tours:', error));
   }, []);
 
   return (
@@ -18,16 +19,16 @@ const AllTours = () => {
       <div className="banner-container">
         <img src={bannerImg} alt="Banner" className="banner" />
         <div className="banner-text">
-          <h1>All Tours</h1>
+          <h1 style={{ color: '#ff8f00' }}>All Tours</h1>
         </div>
       </div>
 
-      <h2 style={{ textAlign: 'center', margin: '20px 0' }}>
+      <h2 style={{ textAlign: 'center', margin: '20px 0', color: 'black' }}>
         Explore Tourist Attractions
       </h2>
 
       <div className="tour-grid">
-        {tours.map(tour => (
+        {tours.map((tour) => (
           <TourCard key={tour.id} tour={tour} />
         ))}
       </div>
