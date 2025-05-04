@@ -33,61 +33,67 @@ const ItineraryPage = () => {
       <p><strong>Total Budget:</strong> Rs {itinerary.budget}</p>
       <hr style={{ margin: '20px 0' }} />
 
-      {itinerary.plan.map((dayPlan) => (
-        <div
-          key={dayPlan.day}
-          style={{
-            border: '1px solid #ddd',
-            borderRadius: '10px',
-            padding: '15px',
-            marginBottom: '20px',
-            backgroundColor: '#fff',
-            boxShadow: '0 2px 5px rgba(0,0,0,0.05)'
-          }}
-        >
-          <h3 style={{ marginBottom: '10px' }}>
-            Day {dayPlan.day} – {getDateForDay(itinerary.startDate || new Date(), dayPlan.day - 1)}
-          </h3>
+      {itinerary.plan && Array.isArray(itinerary.plan) && itinerary.plan.length > 0 ? (
+        itinerary.plan.map((dayPlan) => (
+          <div
+            key={dayPlan.day}
+            style={{
+              border: '1px solid #ddd',
+              borderRadius: '10px',
+              padding: '15px',
+              marginBottom: '20px',
+              backgroundColor: '#fff',
+              boxShadow: '0 2px 5px rgba(0,0,0,0.05)'
+            }}
+          >
+            <h3 style={{ marginBottom: '10px' }}>
+              Day {dayPlan.day} – {getDateForDay(itinerary.startDate || new Date(), dayPlan.day - 1)}
+            </h3>
 
-          <div style={{ marginBottom: '8px' }}>
-            <strong>Activities:</strong>
-            <ul>
-              {dayPlan.activities.map((activity, idx) => (
-                <li key={idx}>{renderPlace(activity)}</li>
-              ))}
-            </ul>
-          </div>
-
-          <div style={{ marginBottom: '8px' }}>
-            <strong>Meals:</strong>
-            <ul>
-              {dayPlan.meals.map((meal, idx) => (
-                <li key={idx}>{renderPlace(meal)}</li>
-              ))}
-            </ul>
-          </div>
-
-          {dayPlan.transport && dayPlan.transport.length > 0 && (
             <div style={{ marginBottom: '8px' }}>
-              <strong>Transport:</strong>
+              <strong>Activities:</strong>
               <ul>
-                {dayPlan.transport.map((t, idx) => (
-                  <li key={idx}>{renderPlace(t)}</li>
+                {dayPlan.activities.map((activity, idx) => (
+                  <li key={idx}>{renderPlace(activity)}</li>
                 ))}
               </ul>
             </div>
-          )}
 
-          {dayPlan.accommodation && (
             <div style={{ marginBottom: '8px' }}>
-              <strong>Stay:</strong>
-              <p>{renderPlace(dayPlan.accommodation)}</p>
+              <strong>Meals:</strong>
+              <ul>
+                {dayPlan.meals.map((meal, idx) => (
+                  <li key={idx}>{renderPlace(meal)}</li>
+                ))}
+              </ul>
             </div>
-          )}
 
-          <p><strong>Daily Budget:</strong> Rs {dayPlan.budget}</p>
+            {dayPlan.transport && dayPlan.transport.length > 0 && (
+              <div style={{ marginBottom: '8px' }}>
+                <strong>Transport:</strong>
+                <ul>
+                  {dayPlan.transport.map((t, idx) => (
+                    <li key={idx}>{renderPlace(t)}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {dayPlan.accommodation && (
+              <div style={{ marginBottom: '8px' }}>
+                <strong>Stay:</strong>
+                <p>{renderPlace(dayPlan.accommodation)}</p>
+              </div>
+            )}
+
+            <p><strong>Daily Budget:</strong> Rs {dayPlan.budget}</p>
+          </div>
+        ))
+      ) : (
+        <div style={{ textAlign: 'center' }}>
+          <p>No detailed plan available for this itinerary.</p>
         </div>
-      ))}
+      )}
     </div>
   );
 };

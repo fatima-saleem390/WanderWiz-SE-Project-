@@ -32,13 +32,21 @@ const PlanTrip = () => {
   };
 
   const handleSubmit = async () => {
+    // Remove emojis from the interests array
+    const cleanedInterests = interests.map((interest) => interest.replace(/[^\w\s]/gi, ''));
+  
+    // Remove emojis from the selected pace, transport, and accommodation options
+    const cleanedPace = pace.replace(/[^\w\s]/gi, '');
+    const cleanedTransport = transport.replace(/[^\w\s]/gi, '');
+    const cleanedAccommodation = accommodation.replace(/[^\w\s]/gi, '');
+  
     const formData = {
       dateRange: dateRange[0],
       budget,
-      interests,
-      pace,
-      transport,
-      accommodation,
+      interests: cleanedInterests, // Use the cleaned interests
+      pace: cleanedPace, // Use the cleaned pace
+      transport: cleanedTransport, // Use the cleaned transport
+      accommodation: cleanedAccommodation, // Use the cleaned accommodation
       notes,
       people,
     };
@@ -52,15 +60,16 @@ const PlanTrip = () => {
   
       const data = await response.json();
       console.log('Generated Itinerary:', data);
-      
+  
       localStorage.setItem('itinerary', JSON.stringify(data));
       navigate('/itinerary');
-
+      
     } catch (error) {
       console.error('Error generating trip:', error);
       alert('Failed to generate trip. Please try again.');
     }
   };
+  
   
   
 
