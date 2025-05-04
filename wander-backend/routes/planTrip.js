@@ -29,7 +29,7 @@ async function generateItineraryFromDB(input) {
     const dayPlan = { day, activities: [] };
 
     // TRANSPORT
-    if (transport !== 'walk only') {
+    if (transport !== 'Walk Only') {
       const transportData = await TransportOption.findOne({ type: transport });
       if (transportData && transportData.options.length > 0) {
         const bestOption = transportData.options.find(opt => opt.pricePerRide <= transportBudget);
@@ -39,12 +39,13 @@ async function generateItineraryFromDB(input) {
             name: bestOption.name,
             pricePerRide: bestOption.pricePerRide
           });
+          console.log('Transport Data:', bestOption);
         }
       }
     }
 
     // ACCOMMODATION
-    if (accommodation !== 'none') {
+    if (accommodation !== 'None') {
       const stay = await Accommodation.findOne({
         type: accommodation,
         pricePerNight: { $lte: accommodationBudget }
@@ -55,18 +56,19 @@ async function generateItineraryFromDB(input) {
           name: stay.name,
           pricePerNight: stay.pricePerNight
         });
+        console.log('Accommodation Data:', stay);
       }
     }
 
     // INTERESTS
-    const maxActivities = pace === 'fast' ? 4 : pace === 'balanced' ? 3 : 2;
+    const maxActivities = pace === 'Fast-Paced' ? 4 : pace === 'Balanced' ? 3 : 2;
     let count = 0;
 
     for (let interest of interests.map(i => i.trim().toLowerCase())) {
       if (count >= maxActivities) break;
 
       switch (interest) {
-        case 'food': {
+        case 'Food': {
           const rest = await Restaurant.findOne({
             averageCost: { $lte: interestBudget / maxActivities },
             genres: { $in: ['food'] }
@@ -82,7 +84,7 @@ async function generateItineraryFromDB(input) {
           break;
         }
 
-        case 'culture': {
+        case 'Culture': {
           const place = await HistoricalPlace.findOne({
             genres: { $in: ['culture'] },
             tourGuideFee: { $lte: interestBudget / maxActivities }
@@ -99,12 +101,12 @@ async function generateItineraryFromDB(input) {
           break;
         }
 
-        case 'adventure':
-        case 'nature':
-        case 'festivals':
-        case 'shopping':
-        case 'relaxation':
-        case 'insta spots': {
+        case 'Adventure':
+        case 'Nature':
+        case 'Festivals':
+        case 'Shopping':
+        case 'Relaxation':
+        case 'Insta Spots': {
           const activity = await OutdoorActivity.findOne({
             genres: { $in: [interest] },
             price: { $lte: interestBudget / maxActivities }
@@ -130,12 +132,25 @@ async function generateItineraryFromDB(input) {
 
 router.post('/plan-trip', async (req, res) => {
   try {
+    console.log("Request body received at /plan-trip:", req.body);
+
     const itinerary = await generateItineraryFromDB(req.body);
-    res.json(itinerary);
+
+    const response = {
+      name: `Trip Plan for ${req.body.people} person${req.body.people > 1 ? 's' : ''}`,
+      budget: req.body.budget,
+      days: req.body.dateRange,
+      dayPlans: itinerary
+    };
+
+    console.log("Final itinerary response:", response);
+
+    res.json(response);
   } catch (error) {
     console.error('Error generating itinerary:', error);
     res.status(500).json({ message: 'Failed to generate itinerary' });
   }
 });
+
 
 module.exports = router;

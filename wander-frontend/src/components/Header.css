@@ -44,7 +44,7 @@
 /* Styling for the "Plan a trip" button */
 .post-btn {
   padding: 8px 16px;
-  background-color: #ff6f00;
+  background-color: #ff8f00;
   color: #fff;
   border: none;
   border-radius: 20px;
@@ -54,7 +54,7 @@
 }
 
 .post-btn:hover {
-  background-color: #ff8f00;
+  background-color:  #ff6f00;
 }
 
 /* Mobile responsiveness */
@@ -69,4 +69,59 @@
     flex-direction: column;
     align-items: flex-start;
   }
+}
+.logout-btn {
+  padding: 8px 16px;
+  background-color: #ff8f00;
+  color: #fff;
+  border: none;
+  border-radius: 20px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.logout-btn:hover {
+  background-color: #ff6f00;
+}
+
+.confirm-logout-box {
+  position: absolute;
+  top: 70px; /* adjust if needed */
+  right: 40px;
+  background: white;
+  border: 1px solid #ddd;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+  padding: 12px 20px;
+  border-radius: 10px;
+  z-index: 999;
+  font-weight: normal;
+}
+
+.confirm-logout-box p {
+  margin: 0 0 10px 0;
+  font-size: 14px;
+}
+
+.confirm-btns {
+  display: flex;
+  gap: 10px;
+}
+
+.confirm-btns button {
+  padding: 6px 14px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.confirm-btns button:first-child {
+  background-color: #ff8f00;
+  color: white;
+}
+
+.confirm-btns button:last-child {
+  background-color: #aaa;
+  color: white;
 }

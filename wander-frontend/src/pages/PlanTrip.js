@@ -20,7 +20,6 @@ const PlanTrip = () => {
   const [transport, setTransport] = useState('');
   const [accommodation, setAccommodation] = useState('');
   const [notes, setNotes] = useState('');
-  const [itinerary, setItinerary] = useState(null);
 
   const navigate = useNavigate();
 
@@ -63,7 +62,7 @@ const PlanTrip = () => {
   
       localStorage.setItem('itinerary', JSON.stringify(data));
       navigate('/itinerary');
-      
+
     } catch (error) {
       console.error('Error generating trip:', error);
       alert('Failed to generate trip. Please try again.');
