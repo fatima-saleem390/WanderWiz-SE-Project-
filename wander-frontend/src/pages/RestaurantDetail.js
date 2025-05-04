@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { FaStar, FaRegStar } from 'react-icons/fa';
+import axios from 'axios';
 import './PlaceDetail.css';
 
 const RestaurantDetail = () => {
@@ -10,12 +11,8 @@ const RestaurantDetail = () => {
   const [error, setError] = useState(null);
   const [activeTab, setActiveTab] = useState('about');
   const [submitting, setSubmitting] = useState(false);
-
-  const [newReview, setNewReview] = useState({
-    username: '',
-    review: '',
-    rating: 0
-  });
+  const [newReview, setNewReview] = useState({ username: '', review: '', rating: 0 });
+  const [token, setToken] = useState(localStorage.getItem('token')); // Get token from localStorage
 
   // Fetch restaurant details
   const fetchRestaurantDetail = async () => {
@@ -37,40 +34,27 @@ const RestaurantDetail = () => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setNewReview(prev => ({ ...prev, [name]: value }));
+    setNewReview((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleRatingChange = (value) => {
-    setNewReview(prev => ({ ...prev, rating: value }));
+    setNewReview((prev) => ({ ...prev, rating: value }));
   };
 
   const handleReviewSubmit = async (e) => {
     e.preventDefault();
     setSubmitting(true);
-    console.log(newReview);
-    console.log("Decoded restaurant name:", restaurant);
-    const encodedRestaurantName = encodeURIComponent(restaurant);
-
-    // Result: "Yum%20Chinese%20%26%20Thai"
-    
-    // Submit the new review to the backend at the updated URL
     try {
-      const res = await fetch(`http://localhost:5000/api/tours/${id}/restaurants/${encodedRestaurantName}/userReviews`
-      , {
+      const res = await fetch(`http://localhost:5000/api/tours/${id}/restaurants/${encodeURIComponent(restaurant)}/userReviews`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(newReview)
+        body: JSON.stringify(newReview),
       });
 
-      if (!res.ok) throw new Error("Failed to submit review.");
+      if (!res.ok) throw new Error('Failed to submit review.');
 
-      // Fetch updated restaurant details with the new review
       await fetchRestaurantDetail();
-      setNewReview({
-        username: '',
-        review: '',
-        rating: 0
-      });
+      setNewReview({ username: '', review: '', rating: 0 });
     } catch (err) {
       setError(err.message);
     } finally {
@@ -78,13 +62,52 @@ const RestaurantDetail = () => {
     }
   };
 
+  const handleSaveRestaurant = async () => {
+    if (!token) {
+      alert('Please login to save this restaurant.');
+      return;
+    }
+
+    if (!restaurantDetail.name) {
+      alert('Restaurant name is required!');
+      return;
+    }
+
+    try {
+      const response = await axios.post(
+        'http://localhost:5000/api/auth/save-place',
+        {
+          placeName: restaurantDetail.name,
+          placeType: 'restaurant',
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (response.data.success) {
+        alert('Restaurant saved!');
+      } else {
+        if (response.data.message === 'Restaurant already saved') {
+          alert('This restaurant is already in your saved list.');
+        } else {
+          alert('Failed to save the restaurant.');
+        }
+      }
+    } catch (error) {
+      console.error('Error saving restaurant:', error.response?.data || error.message);
+      alert('Restaurant already saved');
+    }
+  };
+
   if (loading) return <div className="container"><p>Loading...</p></div>;
   if (error) return <div className="container"><p>Error: {error}</p></div>;
 
-  // Check if restaurantDetail is defined before destructuring
   if (!restaurantDetail) return <div className="container"><p>No data available.</p></div>;
 
-  const { name, image, address, rating, description, userReviews, location } = restaurantDetail;
+  const { name, image, address, rating, description, userReviews } = restaurantDetail;
   const hasReviews = userReviews && userReviews.length > 0;
 
   return (
@@ -120,13 +143,7 @@ const RestaurantDetail = () => {
             <>
               <h4 className="section-title">Description</h4>
               <p className="description">{description || "No description available."}</p>
-              {location && (
-                <div className="location-section">
-                  <h4 className="section-title">Location</h4>
-                  <p>Latitude: {location.lat}</p>
-                  <p>Longitude: {location.lng}</p>
-                </div>
-              )}
+              <button className="save-button" onClick={handleSaveRestaurant}>Save</button>
             </>
           ) : (
             <>
@@ -188,8 +205,6 @@ const RestaurantDetail = () => {
               </form>
             </>
           )}
-
-          
         </div>
       </div>
     </div>

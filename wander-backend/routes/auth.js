@@ -117,6 +117,51 @@ router.post('/bookmark', async (req, res) => {
   }
 });
 
+router.post('/save-place', async (req, res) => {
+  const { placeName, placeType } = req.body;
+  const authHeader = req.headers.authorization;
+
+  if (!placeName) {
+    return res.status(400).json({ message: 'Place name is required' });
+  }
+
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return res.status(403).json({ message: 'No token provided' });
+  }
+
+  const token = authHeader.split(' ')[1];
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const user = await User.findById(decoded.id);
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Check if place is already saved by cityTitle and placeName
+    const alreadySaved = user.savedPlaces?.some(
+      (place) =>  place.placeName === placeName
+    );
+
+    if (alreadySaved) {
+      return res.status(400).json({ message: 'Place already saved' });
+    }
+
+    // Save the place (cityTitle, placeName, placeType) to the user's savedPlaces array
+    user.savedPlaces.push({placeName, placeType });
+    await user.save();
+
+    return res.status(200).json({
+      success: true,
+      message: 'Place saved successfully',
+      savedPlaces: user.savedPlaces,
+    });
+  } catch (err) {
+    console.error('Error saving place:', err);
+    return res.status(500).json({ message: 'Server error' });
+  }
+});
 
 
 module.exports = router;

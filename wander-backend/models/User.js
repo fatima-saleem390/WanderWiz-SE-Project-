@@ -8,7 +8,15 @@ const userSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
   mobileNumber: { type: String, required: true },
-  bookmarkedCities: [{ type: String }]
+  bookmarkedCities: [{ type: String }],
+  savedPlaces: [
+    {
+      cityTitle: String,
+      placeName: String,
+      placeType: String, // 'historical', 'restaurant', or 'hotel'
+    }
+  ]
+  
 });
 
 // Hash password before saving

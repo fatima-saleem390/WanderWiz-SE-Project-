@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { FaStar, FaRegStar } from 'react-icons/fa';
+import axios from 'axios';
 import './PlaceDetail.css';
 
 const HistoricalPlaceDetail = () => {
@@ -10,12 +11,8 @@ const HistoricalPlaceDetail = () => {
   const [error, setError] = useState(null);
   const [activeTab, setActiveTab] = useState('about');
   const [submitting, setSubmitting] = useState(false);
-
-  const [newReview, setNewReview] = useState({
-    username: '',
-    review: '',
-    rating: 0
-  });
+  const [newReview, setNewReview] = useState({ username: '', review: '', rating: 0 });
+  const [token, setToken] = useState(localStorage.getItem('token')); // Get token from localStorage (or wherever you store it)
 
   // Fetch historical place details
   const fetchHistoricalPlaceDetail = async () => {
@@ -37,35 +34,27 @@ const HistoricalPlaceDetail = () => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setNewReview(prev => ({ ...prev, [name]: value }));
+    setNewReview((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleRatingChange = (value) => {
-    setNewReview(prev => ({ ...prev, rating: value }));
+    setNewReview((prev) => ({ ...prev, rating: value }));
   };
 
   const handleReviewSubmit = async (e) => {
     e.preventDefault();
     setSubmitting(true);
-    console.log(newReview);
-    console.log("Decoded historical place name:", place);
-    const encodedPlaceName = encodeURIComponent(place);
-
     try {
-      const res = await fetch(`http://localhost:5000/api/tours/${id}/historical-places/${encodedPlaceName}/userReviews`, {
+      const res = await fetch(`http://localhost:5000/api/tours/${id}/historical-places/${encodeURIComponent(place)}/userReviews`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(newReview)
+        body: JSON.stringify(newReview),
       });
 
-      if (!res.ok) throw new Error("Failed to submit review.");
+      if (!res.ok) throw new Error('Failed to submit review.');
 
       await fetchHistoricalPlaceDetail();
-      setNewReview({
-        username: '',
-        review: '',
-        rating: 0
-      });
+      setNewReview({ username: '', review: '', rating: 0 });
     } catch (err) {
       setError(err.message);
     } finally {
@@ -73,14 +62,52 @@ const HistoricalPlaceDetail = () => {
     }
   };
 
- 
+  const handleSavePlace = async () => {
+    if (!token) {
+      alert('Please login to save this place.');
+      return;
+    }
+
+    if (!place.name) {
+      alert('Place name is required!');
+      return;
+    }
+
+    try {
+      const response = await axios.post(
+        'http://localhost:5000/api/auth/save-place',
+        {
+          placeName: place.name,
+          placeType: 'historical',
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (response.data.success) {
+        alert('Place saved!');
+      } else {
+        if (response.data.message === 'Place already saved') {
+          alert('This place is already in your saved list.');
+        } else {
+          alert('Failed to save the place.');
+        }
+      }
+    } catch (error) {
+      console.error('Error saving place:', error.response?.data || error.message);
+      alert('Place already saved');
+    }
+  };
 
   if (loading) return <div className="container"><p>Loading...</p></div>;
   if (error) return <div className="container"><p>Error: {error}</p></div>;
 
   if (!historicalPlaceDetail) return <div className="container"><p>No data available.</p></div>;
 
-  const { name, image, address, rating, description, userReviews, location } = historicalPlaceDetail;
+  const { name, image, address, rating, description, userReviews } = historicalPlaceDetail;
   const hasReviews = userReviews && userReviews.length > 0;
 
   return (
@@ -116,13 +143,7 @@ const HistoricalPlaceDetail = () => {
             <>
               <h4 className="section-title">Description</h4>
               <p className="description">{description || "No description available."}</p>
-              {location && (
-                <div className="location-section">
-                  <h4 className="section-title">Location</h4>
-                  <p>Latitude: {location.lat}</p>
-                  <p>Longitude: {location.lng}</p>
-                </div>
-              )}
+              <button className="save-button" onClick={handleSavePlace}>Save</button>
             </>
           ) : (
             <>

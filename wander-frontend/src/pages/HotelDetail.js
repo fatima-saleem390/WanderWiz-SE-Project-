@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { FaStar, FaRegStar } from 'react-icons/fa';
+import axios from 'axios';
 import './PlaceDetail.css';
 
 const HotelDetail = () => {
@@ -10,14 +11,9 @@ const HotelDetail = () => {
   const [error, setError] = useState(null);
   const [activeTab, setActiveTab] = useState('about');
   const [submitting, setSubmitting] = useState(false);
+  const [newReview, setNewReview] = useState({ username: '', review: '', rating: 0 });
+  const [token, setToken] = useState(localStorage.getItem('token'));
 
-  const [newReview, setNewReview] = useState({
-    username: '',
-    review: '',
-    rating: 0
-  });
-
-  // Fetch hotel details
   const fetchHotelDetail = async () => {
     setLoading(true);
     try {
@@ -37,35 +33,27 @@ const HotelDetail = () => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setNewReview(prev => ({ ...prev, [name]: value }));
+    setNewReview((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleRatingChange = (value) => {
-    setNewReview(prev => ({ ...prev, rating: value }));
+    setNewReview((prev) => ({ ...prev, rating: value }));
   };
 
   const handleReviewSubmit = async (e) => {
     e.preventDefault();
     setSubmitting(true);
-    console.log(newReview);
-    console.log("Decoded hotel name:", hotel);
-    const encodedHotelName = encodeURIComponent(hotel);
-
     try {
-      const res = await fetch(`http://localhost:5000/api/tours/${id}/hotels/${encodedHotelName}/userReviews`, {
+      const res = await fetch(`http://localhost:5000/api/tours/${id}/hotels/${encodeURIComponent(hotel)}/userReviews`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(newReview)
+        body: JSON.stringify(newReview),
       });
 
-      if (!res.ok) throw new Error("Failed to submit review.");
+      if (!res.ok) throw new Error('Failed to submit review.');
 
       await fetchHotelDetail();
-      setNewReview({
-        username: '',
-        review: '',
-        rating: 0
-      });
+      setNewReview({ username: '', review: '', rating: 0 });
     } catch (err) {
       setError(err.message);
     } finally {
@@ -73,14 +61,51 @@ const HotelDetail = () => {
     }
   };
 
-  
+  const handleSaveHotel = async () => {
+    if (!token) {
+      alert('Please login to save this hotel.');
+      return;
+    }
+
+    if (!hotelDetail?.name) {
+      alert('Hotel name is required!');
+      return;
+    }
+
+    try {
+      const response = await axios.post(
+        'http://localhost:5000/api/auth/save-place',
+        {
+          placeName: hotelDetail.name,
+          placeType: 'hotel',
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (response.data.success) {
+        alert('Hotel saved!');
+      } else {
+        if (response.data.message === 'Hotel already saved') {
+          alert('This hotel is already in your saved list.');
+        } else {
+          alert('Failed to save the hotel.');
+        }
+      }
+    } catch (error) {
+      console.error('Error saving hotel:', error.response?.data || error.message);
+      alert('Hotel already saved');
+    }
+  };
 
   if (loading) return <div className="container"><p>Loading...</p></div>;
   if (error) return <div className="container"><p>Error: {error}</p></div>;
-
   if (!hotelDetail) return <div className="container"><p>No data available.</p></div>;
 
-  const { name, image, address, rating, description, userReviews, location } = hotelDetail;
+  const { name, image, address, rating, description, userReviews } = hotelDetail;
   const hasReviews = userReviews && userReviews.length > 0;
 
   return (
@@ -116,13 +141,7 @@ const HotelDetail = () => {
             <>
               <h4 className="section-title">Description</h4>
               <p className="description">{description || "No description available."}</p>
-              {location && (
-                <div className="location-section">
-                  <h4 className="section-title">Location</h4>
-                  <p>Latitude: {location.lat}</p>
-                  <p>Longitude: {location.lng}</p>
-                </div>
-              )}
+              <button className="save-button" onClick={handleSaveHotel}>Save</button>
             </>
           ) : (
             <>
@@ -184,8 +203,6 @@ const HotelDetail = () => {
               </form>
             </>
           )}
-
-          
         </div>
       </div>
     </div>
