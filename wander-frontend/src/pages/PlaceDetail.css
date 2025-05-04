@@ -93,7 +93,7 @@
 }
 
 .tab-button.active {
-  color: #ef4444;
+  color:#ff8f00;
   border-bottom: 2px solid #ef4444;
 }
 
@@ -114,7 +114,7 @@
   display: block;
   margin: 2rem auto 0;
   padding: 10px 28px;
-  background-color: #f87171;
+  background-color: #ff8f00;
   color: white;
   font-weight: bold;
   border: none;
@@ -125,7 +125,7 @@
 }
 
 .save-button:hover {
-  background-color: #ef4444;
+  background-color: #ff8f00;
 }
 
 /* Review Section */
@@ -221,7 +221,7 @@
 /* Submit Button Larger and Centered */
 .review-form button {
   padding: 12px 24px; /* Increased padding */
-  background-color: #f87171;
+  background-color: #ff8f00;
   color: white;
   font-weight: bold;
   border: none;
