@@ -51,9 +51,11 @@ const PlanTrip = () => {
       });
   
       const data = await response.json();
-      console.log('Generated Itinerary:', itinerary);
+      console.log('Generated Itinerary:', data);
       
-      navigate('/itinerary', { state: { itinerary: data } });
+      localStorage.setItem('itinerary', JSON.stringify(data));
+      navigate('/itinerary');
+
     } catch (error) {
       console.error('Error generating trip:', error);
       alert('Failed to generate trip. Please try again.');
@@ -147,7 +149,7 @@ const PlanTrip = () => {
         <div className="section">
           <h3>🏨 Preferred Accommodation?</h3>
           <div className="options-grid">
-            {[' Hostel 🛏️', ' Hotel 🛎️', ' Guest House 🏠', ' Airbnb 🏡', ' Resort 🍹', ' Unique Stays ⛺'].map((item) => (
+            {[' Hostel 🛏️', ' Hotel 🛎️', ' Guest House 🏠', ' Airbnb 🏡', ' Resort 🍹', ' Unique Stays ⛺', 'None ❎'].map((item) => (
               <label key={item} className="radio">
                 <input type="radio" name="accommodation" value={item} onChange={(e) => setAccommodation(e.target.value)} />
                 {item}

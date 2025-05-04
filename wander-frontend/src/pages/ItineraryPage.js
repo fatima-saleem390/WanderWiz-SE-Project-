@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 
 const ItineraryPage = () => {
   const location = useLocation();
-  const itinerary = location.state?.itinerary;
+  const itinerary = location.state?.itinerary || JSON.parse(localStorage.getItem('itinerary'));
   const navigate = useNavigate();
 
   if (!itinerary) {
