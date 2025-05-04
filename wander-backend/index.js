@@ -172,6 +172,32 @@ app.get('/api/tours/:id/hotels/:hotel', async (req, res) => {
     res.status(500).json({ message: 'Error fetching hotel', error });
   }
 });
+app.post('/api/tours/:id/restaurants/:restaurant/userReviews', async (req, res) => {
+  const { id, restaurant } = req.params;
+  const { username, review, rating } = req.body;
+
+  try {
+    // Find the tour by its ID
+    const tour = await Tour.findOne({ id: parseInt(id) });
+    if (!tour) return res.status(404).json({ message: 'Tour not found' });
+
+    // Find the restaurant by name (case insensitive)
+    const foundRestaurant = tour.restaurants.find(
+      r => r.name.toLowerCase() === decodeURIComponent(restaurant).toLowerCase()
+    );
+    if (!foundRestaurant) return res.status(404).json({ message: 'Restaurant not found' });
+
+    // Add the review to the restaurant's userReviews array
+    foundRestaurant.userReviews.push({ username, review, rating });
+    await tour.save();
+
+    // Return success response
+    res.status(201).json({ message: 'Review added' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
 
 app.post('/api/tours/:id/historical-places/:place/userReviews', async (req, res) => {
   const { id, place } = req.params;

@@ -5,6 +5,7 @@ import Header from './components/Header';
 import Footer from './components/Footer';
 import Home from './pages/Home';
 import About from './pages/About';
+import Gallery from './pages/Gallery';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import AllTours from './pages/AllTours';
@@ -29,6 +30,7 @@ function App() {
           <Route path="/" element={<Navigate to="/register" />} />
           <Route path="/home" element={<Home />} />
           <Route path="/about" element={<About />} />
+          <Route path="/gallery" element={<Gallery />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/listing" element={<AllTours />} />

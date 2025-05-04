@@ -7,10 +7,11 @@ const userSchema = new mongoose.Schema({
   username: { type: String, required: true, unique: true },
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
-  mobileNumber: { type: String, required: true }
+  mobileNumber: { type: String, required: true },
+  bookmarkedCities: [{ type: String }]
 });
 
-// Hash password before saving to database
+// Hash password before saving
 userSchema.pre('save', async function(next) {
   if (!this.isModified('password')) return next();
 
@@ -23,7 +24,7 @@ userSchema.pre('save', async function(next) {
   }
 });
 
-// Method to compare entered password with the hashed password
+// Compare passwords
 userSchema.methods.comparePassword = async function(password) {
   return await bcrypt.compare(password, this.password);
 };
