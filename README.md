@@ -12,9 +12,9 @@ A full-stack web application built to help users explore, bookmark, and plan tri
 
 ## 🛠️ Tech Stack
 
-- **Frontend**: React.js, Tailwind CSS
+- **Frontend**: React.js,CSS ,JavaScript
 - **Backend**: Node.js, Express.js
-- **Database**: MongoDB (Mongoose)
+- **Database**: MongoDB (MongoDB Atlas)
 - **Design & Planning**: Figma, Lucidchart
 
 ## 📐 System Design
