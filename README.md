@@ -5,10 +5,10 @@ A full-stack web application built to help users explore, bookmark, and plan tri
 ## 🔍 Features
 
 - 🌆 Browse cities with detailed historical places, hotels, and restaurants.
-- 📌 Bookmark cities and save favorite places (hotels, restaurants, landmarks).
+- 📌 Bookmark cities and save favorite places (hotels, restaurants, historical places).
 - 🧾 User authentication with signup/login functionality.
 - 📷 Image gallery and reviews for each location.
-- ⚙️ Admin dashboard (optional - if implemented).
+- 🧾 Build custom travel plans based on selected destinations and saved places
 
 ## 🛠️ Tech Stack
 
