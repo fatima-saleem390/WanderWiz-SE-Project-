@@ -74,7 +74,7 @@ async function generateItineraryFromDB(input) {
     }
 
     // INTERESTS
-    const maxActivities = pace === 'Fast-Paced' ? 4 : pace === 'Balanced' ? 3 : 2;
+    const maxActivities = pace === ' Fast-Paced' ? 4 : pace === ' Balanced' ? 3 : 2;
     let count = 0;
 
     for (let interest of cleanedInput.interests) {
@@ -84,7 +84,7 @@ async function generateItineraryFromDB(input) {
         case 'food': {
           const rest = await Restaurant.findOne({
             averageCost: { $lte: interestBudget / maxActivities },
-            genres: { $in: ['Food'] }
+            genres: { $in: ['Food' ] }
           });
           if (rest) {
             dayPlan.activities.push({
