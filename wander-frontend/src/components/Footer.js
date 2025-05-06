@@ -22,18 +22,33 @@ const Footer = () => {
   };
 
   // Handle form submission
-  const handleSubscribe = (e) => {
+  const handleSubscribe = async (e) => {
     e.preventDefault();
 
     if (validateEmail(email)) {
       setEmailError('');
-      // Show pop-up on successful subscription
-      alert('Subscribed successfully! Check your inbox for updates.');
-      // You can add your actual subscription logic here, like API calls
+      try {
+        const response = await fetch('http://localhost:5000/api/subscribe', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ email }),
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+          alert('Subscribed successfully! Check your inbox for updates.');
+          setEmail('');
+        } else {
+          alert(result.message || 'Subscription failed.');
+        }
+      } catch (error) {
+        alert('An error occurred. Please try again later.');
+      }
     } else {
-      
-      // Show pop-up for invalid email
-      alert('Please enter a valid email address.');
+      setEmailError('Please enter a valid email address.');
     }
   };
 

@@ -11,7 +11,7 @@ const userSchema = new mongoose.Schema({
   bookmarkedCities: [{ type: String }],
   savedPlaces: [
     {
-      cityTitle: String,
+      
       placeName: String,
       placeType: String, // 'historical', 'restaurant', or 'hotel'
     }

@@ -68,7 +68,7 @@ const HistoricalPlaceDetail = () => {
       return;
     }
 
-    if (!place.name) {
+    if (!historicalPlaceDetail.name) {
       alert('Place name is required!');
       return;
     }
@@ -77,7 +77,7 @@ const HistoricalPlaceDetail = () => {
       const response = await axios.post(
         'http://localhost:5000/api/auth/save-place',
         {
-          placeName: place.name,
+          placeName: historicalPlaceDetail.name,
           placeType: 'historical',
         },
         {
