@@ -58,7 +58,7 @@ const Header = () => {
         ) : (
           <>
             <NavLink 
-              to="/" 
+              to="/home" // ✅ FIXED: Home now points to /home
               className={({ isActive }) => isActive ? 'nav-link active-link' : 'nav-link'}
             >
               Home
