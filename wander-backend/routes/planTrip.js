@@ -10,9 +10,9 @@ const {
 } = require('../models/ItineraryDataModels');
 
 // Helper to shuffle an array
-function shuffle(arr) {
-  return arr.sort(() => Math.random() - 0.5);
-}
+//function shuffle(arr) {
+//  return arr.sort(() => Math.random() - 0.5);
+//}
 
 
 // Main itinerary generator
@@ -44,37 +44,16 @@ async function generateItineraryFromDB(input) {
   const accommodationBudget = accommodationPct * perPersonPerDayBudget;
   const interestBudget = interestsPct * perPersonPerDayBudget;
 
+  // Fetch and shuffle all restaurants at once
+  const allRestaurants = shuffle(await Restaurant.find({
+    averageCost: { $lte: interestBudget / 3 }
+  }));
+
+  const usedRestaurantIds = new Set(); // Track used restaurants
   const dailyPlan = [];
-  const maxActivities = pace === ' Fast-Paced' ? 4 : pace === ' Balanced' ? 3 : 2;
 
-  // Prefetch and shuffle all interests
-  const allRestaurants = cleanedInput.interests.includes('food')
-    ? shuffle(await Restaurant.find({
-        averageCost: { $lte: interestBudget / maxActivities },
-        genres: { $in: ['Food'] }
-      }))
-    : [];
-
-  const allHistoricalPlaces = cleanedInput.interests.includes('culture')
-    ? shuffle(await HistoricalPlace.find({
-        genres: { $in: ['Culture'] },
-        tourGuideFee: { $lte: interestBudget / maxActivities }
-      }))
-    : [];
-
-  const outdoorActivities = {};
-  for (let interest of cleanedInput.interests) {
-    if (!['food', 'culture'].includes(interest)) {
-      outdoorActivities[interest] = shuffle(await OutdoorActivity.find({
-        genres: { $in: [new RegExp(`^${interest}$`, 'i')] },
-        price: { $lte: interestBudget / maxActivities }
-      }));
-    }
-  }
-
-  // Loop through each day
   for (let day = 1; day <= totalDays; day++) {
-    const dayPlan = { day, activities: [] };
+    const dayPlan = { day, activities: [], meals: [] };
 
     // TRANSPORT
     if (cleanedInput.transport !== 'Walk Only') {
@@ -107,26 +86,20 @@ async function generateItineraryFromDB(input) {
     }
 
     // INTERESTS
+    const maxActivities = pace === 'Fast-Paced' ? 4 : pace === 'Balanced' ? 3 : 2;
     let count = 0;
+
     for (let interest of cleanedInput.interests) {
       if (count >= maxActivities) break;
 
       switch (interest) {
-        case 'food':
-          if (allRestaurants.length > 0) {
-            const rest = allRestaurants.pop();
-            dayPlan.activities.push({
-              type: 'restaurant',
-              name: rest.name,
-              pricePerPerson: rest.averageCost
-            });
-            count++;
-          }
-          break;
-
-        case 'culture':
-          if (allHistoricalPlaces.length > 0) {
-            const place = allHistoricalPlaces.pop();
+        case 'culture': {
+          const places = await HistoricalPlace.find({
+            genres: { $in: ['Culture'] },
+            tourGuideFee: { $lte: interestBudget / maxActivities }
+          });
+          if (places.length > 0) {
+            const place = places[Math.floor(Math.random() * places.length)];
             dayPlan.activities.push({
               type: 'historical place',
               name: place.name,
@@ -136,10 +109,20 @@ async function generateItineraryFromDB(input) {
             count++;
           }
           break;
+        }
 
-        default:
-          if (outdoorActivities[interest] && outdoorActivities[interest].length > 0) {
-            const activity = outdoorActivities[interest].pop();
+        case 'adventure':
+        case 'nature':
+        case 'festivals':
+        case 'shopping':
+        case 'relaxation':
+        case 'insta spots': {
+          const activities = await OutdoorActivity.find({
+            genres: { $in: [interest] },
+            price: { $lte: interestBudget / maxActivities }
+          });
+          if (activities.length > 0) {
+            const activity = activities[Math.floor(Math.random() * activities.length)];
             dayPlan.activities.push({
               type: 'outdoor activity',
               name: activity.name,
@@ -148,6 +131,24 @@ async function generateItineraryFromDB(input) {
             count++;
           }
           break;
+        }
+
+        // 'food' is ignored here — handled below in meals
+      }
+    }
+
+    // Add MEALS (3 different restaurants)
+    let mealsAdded = 0;
+    for (let i = 0; i < allRestaurants.length && mealsAdded < 3; i++) {
+      const rest = allRestaurants[i];
+      if (!usedRestaurantIds.has(rest._id.toString())) {
+        usedRestaurantIds.add(rest._id.toString());
+        dayPlan.meals.push({
+          name: rest.name,
+          genre: rest.genres.join(', '),
+          averageCost: rest.averageCost
+        });
+        mealsAdded++;
       }
     }
 
@@ -156,6 +157,15 @@ async function generateItineraryFromDB(input) {
 
   return dailyPlan;
 }
+
+// Helper to shuffle an array
+function shuffle(array) {
+  return array
+    .map(value => ({ value, sort: Math.random() }))
+    .sort((a, b) => a.sort - b.sort)
+    .map(({ value }) => value);
+}
+
 
 // POST route to generate itinerary
 router.post('/plan-trip', async (req, res) => {
