@@ -57,57 +57,67 @@ const ItineraryPage = () => {
                 boxShadow: '0 2px 5px rgba(0,0,0,0.05)'
               }}
             >
-              <h3 style={{ marginBottom: '10px' }}>
+              <h3 style={{ marginBottom: '15px' }}>
                 Day {dayPlan.day} – {getDateForDay(startDate, dayPlan.day - 1)}
               </h3>
-
-              <div style={{ marginBottom: '8px' }}>
-                <strong>Activities:</strong>
-                <ul>
-                  {activities.length > 0 ? (
-                    activities.map((activity, idx) => (
-                      <li key={idx}>{renderPlace(activity)}</li>
-                    ))
-                  ) : (
-                    <li>No activities planned.</li>
+          
+              <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                <tbody>
+                  <tr>
+                    <td style={{ fontWeight: 'bold', verticalAlign: 'top', padding: '8px', width: '20%' }}>Activities:</td>
+                    <td style={{ padding: '8px' }}>
+                      {activities.length > 0 ? (
+                        <ul style={{ margin: 0, paddingLeft: '20px' }}>
+                          {activities.map((activity, idx) => (
+                            <li key={idx}>{renderPlace(activity)}</li>
+                          ))}
+                        </ul>
+                      ) : (
+                        'No activities planned.'
+                      )}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style={{ fontWeight: 'bold', verticalAlign: 'top', padding: '8px' }}>Meals:</td>
+                    <td style={{ padding: '8px' }}>
+                      {meals.length > 0 ? (
+                        <ul style={{ margin: 0, paddingLeft: '20px' }}>
+                          {meals.map((meal, idx) => (
+                            <li key={idx}>{renderPlace(meal)}</li>
+                          ))}
+                        </ul>
+                      ) : (
+                        'No meals planned.'
+                      )}
+                    </td>
+                  </tr>
+                  {transport.length > 0 && (
+                    <tr>
+                      <td style={{ fontWeight: 'bold', verticalAlign: 'top', padding: '8px' }}>Transport:</td>
+                      <td style={{ padding: '8px' }}>
+                        <ul style={{ margin: 0, paddingLeft: '20px' }}>
+                          {transport.map((t, idx) => (
+                            <li key={idx}>{renderPlace(t)}</li>
+                          ))}
+                        </ul>
+                      </td>
+                    </tr>
                   )}
-                </ul>
-              </div>
-
-              <div style={{ marginBottom: '8px' }}>
-                <strong>Meals:</strong>
-                <ul>
-                  {meals.length > 0 ? (
-                    meals.map((meal, idx) => (
-                      <li key={idx}>{renderPlace(meal)}</li>
-                    ))
-                  ) : (
-                    <li>No meals planned.</li>
+                  {dayPlan.accommodation && (
+                    <tr>
+                      <td style={{ fontWeight: 'bold', verticalAlign: 'top', padding: '8px' }}>Stay:</td>
+                      <td style={{ padding: '8px' }}>{renderPlace(dayPlan.accommodation)}</td>
+                    </tr>
                   )}
-                </ul>
-              </div>
-
-              {transport.length > 0 && (
-                <div style={{ marginBottom: '8px' }}>
-                  <strong>Transport:</strong>
-                  <ul>
-                    {transport.map((t, idx) => (
-                      <li key={idx}>{renderPlace(t)}</li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-
-              {dayPlan.accommodation && (
-                <div style={{ marginBottom: '8px' }}>
-                  <strong>Stay:</strong>
-                  <p>{renderPlace(dayPlan.accommodation)}</p>
-                </div>
-              )}
-
-              <p><strong>Daily Budget:</strong> Rs {dayPlan.budget}</p>
+                  <tr>
+                    <td style={{ fontWeight: 'bold', padding: '8px' }}>Daily Budget:</td>
+                    <td style={{ padding: '8px' }}>Rs {dayPlan.budget}</td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
           );
+          
         })
       ) : (
         <div style={{ textAlign: 'center' }}>

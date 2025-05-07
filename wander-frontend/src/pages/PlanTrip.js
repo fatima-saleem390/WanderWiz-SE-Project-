@@ -104,7 +104,7 @@ const PlanTrip = () => {
           <Slider
             range
             min={0}
-            max={30000}
+            max={100000}
             defaultValue={budget}
             onChange={setBudget}
           />
