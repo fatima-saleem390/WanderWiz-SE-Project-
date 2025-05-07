@@ -42,7 +42,7 @@ const ItineraryPage = () => {
         itinerary.plan.map((dayPlan) => {
           // Ensure activities exist before trying to map them
           const activities = Array.isArray(dayPlan.activities) ? dayPlan.activities : [];
-          const meals = Array.isArray(dayPlan.meals) ? dayPlan.meals : [];
+          const meals = Array.isArray(dayPlan.restaurants) ? dayPlan.restaurants : [];
           const transport = Array.isArray(dayPlan.transport) ? dayPlan.transport : [];
 
           return (
