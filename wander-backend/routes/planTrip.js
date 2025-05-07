@@ -9,11 +9,13 @@ const {
   Restaurant
 } = require('../models/ItineraryDataModels');
 
-// Helper to shuffle an array
-//function shuffle(arr) {
-//  return arr.sort(() => Math.random() - 0.5);
-//}
-
+// Shuffle utility
+function shuffle(array) {
+  return array
+    .map(value => ({ value, sort: Math.random() }))
+    .sort((a, b) => a.sort - b.sort)
+    .map(({ value }) => value);
+}
 
 // Main itinerary generator
 async function generateItineraryFromDB(input) {
@@ -36,47 +38,23 @@ async function generateItineraryFromDB(input) {
   const maxBudget = Array.isArray(budget) ? budget[1] : budget;
   const perPersonPerDayBudget = maxBudget / (people * totalDays);
 
-  const transportPct = cleanedInput.transport !== 'Walk Only' ? 0.2 : 0;
-  const accommodationPct = cleanedInput.accommodation !== 'None' ? 0.3 : 0;
-  const interestsPct = 1 - (transportPct + accommodationPct);
+  const allRestaurants = shuffle(await Restaurant.find({}));
+  const usedRestaurantIds = new Set();
+  const usedAccommodationIds = new Set();
+  const usedActivityIds = new Set();
 
-  const transportBudget = transportPct * perPersonPerDayBudget;
-  const accommodationBudget = accommodationPct * perPersonPerDayBudget;
-  const interestBudget = interestsPct * perPersonPerDayBudget;
-
-  // Fetch and shuffle all restaurants at once
-  const allRestaurants = shuffle(await Restaurant.find({
-    averageCost: { $lte: interestBudget / 3 }
-  }));
-
-  const usedRestaurantIds = new Set(); // Track used restaurants
   const dailyPlan = [];
 
   for (let day = 1; day <= totalDays; day++) {
     const dayPlan = { day, activities: [], meals: [] };
-    let budget = 0;
-  
-    // TRANSPORT
-    if (cleanedInput.transport !== 'Walk Only') {
-      const transportData = await TransportOption.findOne({ type: cleanedInput.transport });
-      if (transportData && transportData.options.length > 0) {
-        const bestOption = transportData.options.find(opt => opt.pricePerRide <= transportBudget);
-        if (bestOption) {
-          dayPlan.activities.push({
-            type: 'transport',
-            name: bestOption.name,
-            pricePerRide: bestOption.pricePerRide
-          });
-          budget += bestOption.pricePerRide;
-        }
-      }
-    }
-  
+    let remainingBudget = perPersonPerDayBudget;
+
     // ACCOMMODATION
     if (cleanedInput.accommodation !== 'None') {
       const stay = await Accommodation.findOne({
         type: cleanedInput.accommodation,
-        pricePerNight: { $lte: accommodationBudget }
+        pricePerNight: { $lte: remainingBudget },
+        _id: { $nin: Array.from(usedAccommodationIds) }
       });
       if (stay) {
         dayPlan.activities.push({
@@ -84,22 +62,68 @@ async function generateItineraryFromDB(input) {
           name: stay.name,
           pricePerNight: stay.pricePerNight
         });
-        budget += stay.pricePerNight;
+        remainingBudget -= stay.pricePerNight;
+        usedAccommodationIds.add(stay._id.toString());
       }
     }
-  
-    // INTERESTS
-    const maxActivities = pace === 'Fast-Paced' ? 4 : pace === 'Balanced' ? 3 : 2;
+
+    // TRANSPORT
+    if (cleanedInput.transport !== 'Walk Only') {
+      const transportData = await TransportOption.findOne({ type: cleanedInput.transport });
+      if (transportData && transportData.options.length > 0) {
+        const bestOption = transportData.options.find(opt => opt.pricePerRide <= remainingBudget);
+        if (bestOption) {
+          dayPlan.activities.push({
+            type: 'transport',
+            name: bestOption.name,
+            pricePerRide: bestOption.pricePerRide
+          });
+          remainingBudget -= bestOption.pricePerRide;
+        }
+      }
+    }
+
+    // MEALS (max 3)
+    let mealsAdded = 0;
+
+    const matchingRestaurants = allRestaurants.filter(rest =>
+      rest.genres.some(g =>
+        cleanedInput.interests.includes(g.trim().toLowerCase())
+      )
+    );
+
+    const restaurantPool = matchingRestaurants.length > 0 ? matchingRestaurants : allRestaurants;
+
+    for (let i = 0; i < restaurantPool.length && mealsAdded < 3; i++) {
+      const rest = restaurantPool[i];
+      if (
+        !usedRestaurantIds.has(rest._id.toString()) &&
+        rest.averageCost <= remainingBudget / (3 - mealsAdded)
+      ) {
+        usedRestaurantIds.add(rest._id.toString());
+        dayPlan.meals.push({
+          name: rest.name,
+          genre: rest.genres.join(', '),
+          averageCost: rest.averageCost
+        });
+        remainingBudget -= rest.averageCost;
+        mealsAdded++;
+      }
+    }
+
+    // INTERESTS / ACTIVITIES
+    const maxActivities = cleanedInput.pace === 'Fast-Paced' ? 6 : cleanedInput.pace === 'Relaxed' ? 2 : 3;
     let count = 0;
-  
+
     for (let interest of cleanedInput.interests) {
       if (count >= maxActivities) break;
-  
+
       switch (interest) {
         case 'culture': {
           const places = await HistoricalPlace.find({
             genres: { $in: ['Culture'] },
-            tourGuideFee: { $lte: interestBudget / maxActivities }
+            tourGuideFee: { $lte: remainingBudget },
+            _id: { $nin: Array.from(usedActivityIds) }
           });
           if (places.length > 0) {
             const place = places[Math.floor(Math.random() * places.length)];
@@ -109,12 +133,13 @@ async function generateItineraryFromDB(input) {
               entryFee: place.tourGuideFee,
               guideFee: place.tourGuideFee ? `(Optional guide: $${place.tourGuideFee})` : undefined
             });
-            budget += place.tourGuideFee;
+            // Note: tourGuideFee is optional and not subtracted from remainingBudget
+            usedActivityIds.add(place._id.toString());
             count++;
           }
           break;
         }
-  
+
         case 'adventure':
         case 'nature':
         case 'festivals':
@@ -123,7 +148,8 @@ async function generateItineraryFromDB(input) {
         case 'insta spots': {
           const activities = await OutdoorActivity.find({
             genres: { $in: [interest] },
-            price: { $lte: interestBudget / maxActivities }
+            price: { $lte: remainingBudget },
+            _id: { $nin: Array.from(usedActivityIds) }
           });
           if (activities.length > 0) {
             const activity = activities[Math.floor(Math.random() * activities.length)];
@@ -132,51 +158,44 @@ async function generateItineraryFromDB(input) {
               name: activity.name,
               fee: activity.price
             });
-            budget += activity.price;
+            remainingBudget -= activity.price;
+            usedActivityIds.add(activity._id.toString());
             count++;
           }
           break;
         }
       }
     }
-  
-    // MEALS
-    let mealsAdded = 0;
-    for (let i = 0; i < allRestaurants.length && mealsAdded < 3; i++) {
-      const rest = allRestaurants[i];
-      if (!usedRestaurantIds.has(rest._id.toString())) {
-        usedRestaurantIds.add(rest._id.toString());
-        dayPlan.meals.push({
-          name: rest.name,
-          genre: rest.genres.join(', '),
-          averageCost: rest.averageCost
-        });
-        budget += rest.averageCost;
-        mealsAdded++;
+
+    // Calculate actual amount spent (excluding optional guide fee)
+    let amountSpent = 0;
+
+    for (let act of dayPlan.activities) {
+      if (act.type === 'accommodation') {
+        amountSpent += act.pricePerNight;
+      } else if (act.type === 'transport') {
+        amountSpent += act.pricePerRide;
+      } else if (act.type === 'historical place') {
+        amountSpent += act.entryFee; // Exclude guideFee from total
+      } else if (act.type === 'outdoor activity') {
+        amountSpent += act.fee;
       }
     }
-  
-    // Assign total day budget
-    // Before pushing to dailyPlan
-    dayPlan.budget = perPersonPerDayBudget.toFixed(2);
-    dailyPlan.push(dayPlan);
 
+    for (let meal of dayPlan.meals) {
+      amountSpent += meal.averageCost;
+    }
+
+    //dayPlan.amountSpent = amountSpent.toFixed(2);
+    dayPlan.budget = amountSpent.toFixed(2);
+
+    dailyPlan.push(dayPlan);
   }
-  
 
   return dailyPlan;
 }
 
-// Helper to shuffle an array
-function shuffle(array) {
-  return array
-    .map(value => ({ value, sort: Math.random() }))
-    .sort((a, b) => a.sort - b.sort)
-    .map(({ value }) => value);
-}
-
-
-// POST route to generate itinerary
+// POST route
 router.post('/plan-trip', async (req, res) => {
   try {
     console.log("Request body received at /plan-trip:", req.body);
