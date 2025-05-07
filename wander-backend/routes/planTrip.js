@@ -9,7 +9,13 @@ const {
   Restaurant
 } = require('../models/ItineraryDataModels');
 
-// Helper function to generate itinerary
+// Helper to shuffle an array
+function shuffle(arr) {
+  return arr.sort(() => Math.random() - 0.5);
+}
+
+
+// Main itinerary generator
 async function generateItineraryFromDB(input) {
   const {
     dateRange, budget, interests, pace, transport, accommodation, notes, people
@@ -39,7 +45,34 @@ async function generateItineraryFromDB(input) {
   const interestBudget = interestsPct * perPersonPerDayBudget;
 
   const dailyPlan = [];
+  const maxActivities = pace === ' Fast-Paced' ? 4 : pace === ' Balanced' ? 3 : 2;
 
+  // Prefetch and shuffle all interests
+  const allRestaurants = cleanedInput.interests.includes('food')
+    ? shuffle(await Restaurant.find({
+        averageCost: { $lte: interestBudget / maxActivities },
+        genres: { $in: ['Food'] }
+      }))
+    : [];
+
+  const allHistoricalPlaces = cleanedInput.interests.includes('culture')
+    ? shuffle(await HistoricalPlace.find({
+        genres: { $in: ['Culture'] },
+        tourGuideFee: { $lte: interestBudget / maxActivities }
+      }))
+    : [];
+
+  const outdoorActivities = {};
+  for (let interest of cleanedInput.interests) {
+    if (!['food', 'culture'].includes(interest)) {
+      outdoorActivities[interest] = shuffle(await OutdoorActivity.find({
+        genres: { $in: [new RegExp(`^${interest}$`, 'i')] },
+        price: { $lte: interestBudget / maxActivities }
+      }));
+    }
+  }
+
+  // Loop through each day
   for (let day = 1; day <= totalDays; day++) {
     const dayPlan = { day, activities: [] };
 
@@ -74,25 +107,39 @@ async function generateItineraryFromDB(input) {
     }
 
     // INTERESTS
-    const maxActivities = pace === ' Fast-Paced' ? 4 : pace === ' Balanced' ? 3 : 2;
     let count = 0;
-
     for (let interest of cleanedInput.interests) {
       if (count >= maxActivities) break;
 
       switch (interest) {
-        case 'adventure':
-        case 'nature':
-        case 'festivals':
-        case 'shopping':
-        case 'relaxation':
-        case 'insta spots': {
-          const activities = await OutdoorActivity.find({
-            genres: { $in: [new RegExp(`^${interest}$`, 'i')] },
-            price: { $lte: interestBudget / maxActivities }
-          });
-          if (activities.length > 0) {
-            const activity = activities[Math.floor(Math.random() * activities.length)];
+        case 'food':
+          if (allRestaurants.length > 0) {
+            const rest = allRestaurants.pop();
+            dayPlan.activities.push({
+              type: 'restaurant',
+              name: rest.name,
+              pricePerPerson: rest.averageCost
+            });
+            count++;
+          }
+          break;
+
+        case 'culture':
+          if (allHistoricalPlaces.length > 0) {
+            const place = allHistoricalPlaces.pop();
+            dayPlan.activities.push({
+              type: 'historical place',
+              name: place.name,
+              entryFee: place.tourGuideFee,
+              guideFee: place.tourGuideFee ? `(Optional guide: $${place.tourGuideFee})` : undefined
+            });
+            count++;
+          }
+          break;
+
+        default:
+          if (outdoorActivities[interest] && outdoorActivities[interest].length > 0) {
+            const activity = outdoorActivities[interest].pop();
             dayPlan.activities.push({
               type: 'outdoor activity',
               name: activity.name,
@@ -101,47 +148,6 @@ async function generateItineraryFromDB(input) {
             count++;
           }
           break;
-        }
-        
-        case 'culture': {
-          const places = await HistoricalPlace.find({
-            genres: { $in: ['Culture'] },
-            tourGuideFee: { $lte: interestBudget / maxActivities }
-          });
-          if (places.length > 0) {
-            const place = places[Math.floor(Math.random() * places.length)];
-            dayPlan.activities.push({
-              type: 'historical place',
-              name: place.name,
-              entryFee: place.tourGuideFee,
-              guideFee: place.tourGuideFee ? `(Optional guide: $${place.tourGuideFee})` : undefined
-            });
-            count++;
-          }          
-          break;
-        }
-
-        case 'adventure':
-        case 'nature':
-        case 'festivals':
-        case 'shopping':
-        case 'relaxation':
-        case 'insta spots': {
-          const activities = await OutdoorActivity.find({
-            genres: { $in: [interest] },
-            price: { $lte: interestBudget / maxActivities }
-          });
-          if (activities.length > 0) {
-            const activity = activities[Math.floor(Math.random() * activities.length)];
-            dayPlan.activities.push({
-              type: 'outdoor activity',
-              name: activity.name,
-              fee: activity.price
-            });
-            count++;
-          }          
-          break;
-        }
       }
     }
 
