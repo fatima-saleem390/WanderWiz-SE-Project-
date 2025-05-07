@@ -117,7 +117,7 @@ const RestaurantDetail = () => {
         <img src={image} alt={name} className="place-image" />
         <div className="inner-container">
           <h3 className="place-name">{name}</h3>
-          <p className="place-address">{address || 'No address available'}</p>
+          <p className="place-address">📍{address || 'No address available'}</p>
 
           <div className="rating-row">
             <div className="stars">
