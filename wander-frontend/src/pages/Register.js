@@ -42,7 +42,7 @@ const Register = () => {
 
       if (response.ok) {
         alert('Registration successful!');
-        navigate('/home');
+        navigate('/login');
       } else {
         alert(result.message || 'Registration failed');
       }
