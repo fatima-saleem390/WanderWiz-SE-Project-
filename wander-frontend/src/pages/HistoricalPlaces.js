@@ -58,10 +58,10 @@ const HistoricalPlaces = () => {
                 </div>
                 <div className="category-card-content">
                   <h3>{name}</h3>
-                  <p>{location}</p>
                   <div className="rating">
                     {renderStars(rating)} {/* Display stars */}
                   </div>
+                  <p>📍{location}</p>
                 </div>
               </Link>
             );

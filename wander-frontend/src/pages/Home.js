@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import './Home.css';
 import pinkTree from '../assets/pinkTree.jpg';
 import cowsForest from '../assets/cowsForest.jpg';
@@ -35,40 +36,46 @@ const Home = () => {
       </div>
       {/* Services */}
       <section className="services-section2">
-        <h3>We offer our best services</h3>
-        <div className="services-grid2">
-          <div className="service-card2">
-            <div className="card-content2">
-              <img src={reviewIcon} alt="Review Icon" className="service-img" />
-              <h4>Review & Bookmark System</h4>
-            </div>
-            <p className="card-subtext">
-              Get inspired by real traveler reviews and save <br />
-              your favorite spots for later.
-            </p>
-          </div>
-
-          <div className="service-card2">
-            <div className="card-content2">
-              <img src={tourIcon} alt="Tour Guide Icon" className="service-img" />
-              <h4>Curated Tourist Attractions</h4>
-            </div>
-            <p className="card-subtext">
-              Browse a rich, categorized database of top-rated destinations.
-            </p>
-          </div>
-
-          <div className="service-card2">
-            <div className="card-content2">
-              <img src={itineraryIcon} alt="Itinerary Icon" className="service-img" />
-              <h4>Itinerary Builder</h4>
-            </div>
-            <p className="card-subtext">
-              Build your perfect trip plan from scratch, customizing every detail to suit your travel preferences.
-            </p>
-          </div>
+  <h3>We offer our best services</h3>
+  <div className="services-grid2">
+    <Link to="/listing" className="service-card2-link">
+      <div className="service-card2">
+        <div className="card-content2">
+          <img src={reviewIcon} alt="Review Icon" className="service-img" />
+          <h4>Review & Bookmark System</h4>
         </div>
-      </section>
+        <p className="card-subtext">
+          Get inspired by real traveler reviews and save <br />
+          your favorite spots for later.
+        </p>
+      </div>
+    </Link>
+
+    <Link to="/listing" className="service-card2-link">
+      <div className="service-card2">
+        <div className="card-content2">
+          <img src={tourIcon} alt="Tour Guide Icon" className="service-img" />
+          <h4>Curated Tourist Attractions</h4>
+        </div>
+        <p className="card-subtext">
+          Browse a rich, categorized database of top-rated destinations.
+        </p>
+      </div>
+    </Link>
+
+    <Link to="/plan-trip" className="service-card2-link">
+      <div className="service-card2">
+        <div className="card-content2">
+          <img src={itineraryIcon} alt="Itinerary Icon" className="service-img" />
+          <h4>Itinerary Builder</h4>
+        </div>
+        <p className="card-subtext">
+          Build your perfect trip plan from scratch, customizing every detail to suit your travel preferences.
+        </p>
+      </div>
+    </Link>
+  </div>
+</section>
       {/* Places to Visit */}
 <section className="places-section">
   <button className="explore-button">
