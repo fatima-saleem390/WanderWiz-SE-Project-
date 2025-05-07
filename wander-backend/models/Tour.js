@@ -14,7 +14,7 @@ const restaurantSchema = new mongoose.Schema({
   location: String,
   description: String,
   userReviews: [reviewSchema],
-  rating: Number, // Optional: average rating
+  rating: Number, 
 });
 
 // Hotel Schema
@@ -24,7 +24,7 @@ const hotelSchema = new mongoose.Schema({
   location: String,
   description: String,
   userReviews: [reviewSchema],
-  rating: Number, // Optional: average rating
+  rating: Number, 
 });
 
 // Historical Place Schema
@@ -43,13 +43,10 @@ const tourSchema = new mongoose.Schema({
   name: String,
   description: String,
   image: String,
-  historicalPlaces: [{ type: mongoose.Schema.Types.ObjectId, ref: 'historicalplace' }],
-  restaurants: [{ type: mongoose.Schema.Types.ObjectId, ref: 'restaurant' }],
-  hotels: [{ type: mongoose.Schema.Types.ObjectId, ref: 'hotel' }],
-  rating: { type: Number, default: 0 },
+  historicalPlaces: [historicalPlaceSchema],
+  restaurants: [restaurantSchema],
+  hotels: [hotelSchema],
 });
 
-// Prevent overwriting of the model by checking if it's already defined
-const Tour = mongoose.models.tour || mongoose.model('tour', tourSchema);
-
+const Tour = mongoose.model('Tour', tourSchema); // Tour model
 module.exports = Tour;
