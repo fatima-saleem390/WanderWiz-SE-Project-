@@ -54,7 +54,8 @@ async function generateItineraryFromDB(input) {
 
   for (let day = 1; day <= totalDays; day++) {
     const dayPlan = { day, activities: [], meals: [] };
-
+    let budget = 0;
+  
     // TRANSPORT
     if (cleanedInput.transport !== 'Walk Only') {
       const transportData = await TransportOption.findOne({ type: cleanedInput.transport });
@@ -66,10 +67,11 @@ async function generateItineraryFromDB(input) {
             name: bestOption.name,
             pricePerRide: bestOption.pricePerRide
           });
+          budget += bestOption.pricePerRide;
         }
       }
     }
-
+  
     // ACCOMMODATION
     if (cleanedInput.accommodation !== 'None') {
       const stay = await Accommodation.findOne({
@@ -82,16 +84,17 @@ async function generateItineraryFromDB(input) {
           name: stay.name,
           pricePerNight: stay.pricePerNight
         });
+        budget += stay.pricePerNight;
       }
     }
-
+  
     // INTERESTS
     const maxActivities = pace === 'Fast-Paced' ? 4 : pace === 'Balanced' ? 3 : 2;
     let count = 0;
-
+  
     for (let interest of cleanedInput.interests) {
       if (count >= maxActivities) break;
-
+  
       switch (interest) {
         case 'culture': {
           const places = await HistoricalPlace.find({
@@ -106,11 +109,12 @@ async function generateItineraryFromDB(input) {
               entryFee: place.tourGuideFee,
               guideFee: place.tourGuideFee ? `(Optional guide: $${place.tourGuideFee})` : undefined
             });
+            budget += place.tourGuideFee;
             count++;
           }
           break;
         }
-
+  
         case 'adventure':
         case 'nature':
         case 'festivals':
@@ -128,16 +132,15 @@ async function generateItineraryFromDB(input) {
               name: activity.name,
               fee: activity.price
             });
+            budget += activity.price;
             count++;
           }
           break;
         }
-
-        // 'food' is ignored here — handled below in meals
       }
     }
-
-    // Add MEALS (3 different restaurants)
+  
+    // MEALS
     let mealsAdded = 0;
     for (let i = 0; i < allRestaurants.length && mealsAdded < 3; i++) {
       const rest = allRestaurants[i];
@@ -148,12 +151,18 @@ async function generateItineraryFromDB(input) {
           genre: rest.genres.join(', '),
           averageCost: rest.averageCost
         });
+        budget += rest.averageCost;
         mealsAdded++;
       }
     }
-
+  
+    // Assign total day budget
+    // Before pushing to dailyPlan
+    dayPlan.budget = perPersonPerDayBudget.toFixed(2);
     dailyPlan.push(dayPlan);
+
   }
+  
 
   return dailyPlan;
 }
