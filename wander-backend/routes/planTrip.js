@@ -86,16 +86,23 @@ async function generateItineraryFromDB(input) {
     }
 
     // MEALS (max 3)
+    // MEALS (always 3, try genre match first, fill rest randomly)
     let mealsAdded = 0;
+
     const matchingRestaurants = allRestaurants.filter(rest =>
       rest.genres.some(g =>
         cleanedInput.interests.includes(g.trim().toLowerCase())
       )
     );
-    const restaurantPool = matchingRestaurants.length > 0 ? matchingRestaurants : allRestaurants;
 
-    for (let i = 0; i < restaurantPool.length && mealsAdded < 3; i++) {
-      const rest = restaurantPool[i];
+    const genreBasedPool = shuffle(matchingRestaurants);
+    const fallbackPool = shuffle(allRestaurants.filter(
+      rest => !usedRestaurantIds.has(rest._id.toString())
+    ));
+
+    // 1. Try to add genre-matching meals
+    for (let i = 0; i < genreBasedPool.length && mealsAdded < 3; i++) {
+      const rest = genreBasedPool[i];
       if (
         !usedRestaurantIds.has(rest._id.toString()) &&
         rest.averageCost <= remainingBudget / (3 - mealsAdded)
@@ -110,6 +117,25 @@ async function generateItineraryFromDB(input) {
         mealsAdded++;
       }
     }
+
+    // 2. Fill the rest randomly (even if they don’t match genres)
+    for (let i = 0; i < fallbackPool.length && mealsAdded < 3; i++) {
+      const rest = fallbackPool[i];
+      if (
+        !usedRestaurantIds.has(rest._id.toString()) &&
+        rest.averageCost <= remainingBudget / (3 - mealsAdded)
+      ) {
+        usedRestaurantIds.add(rest._id.toString());
+        dayPlan.meals.push({
+          name: rest.name,
+          genre: rest.genres.join(', '),
+          averageCost: rest.averageCost
+        });
+        remainingBudget -= rest.averageCost;
+        mealsAdded++;
+      }
+    }
+
 
     // ACTIVITIES
     const maxActivities = cleanedInput.pace === 'Fast-Paced' ? 6 : cleanedInput.pace === 'Relaxed' ? 2 : 3;
