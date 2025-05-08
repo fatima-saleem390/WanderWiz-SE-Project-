@@ -24,10 +24,22 @@ const ItineraryPage = () => {
 
   const renderPlace = (place) => {
     if (typeof place === 'string') return place;
-    const price = place.price || place.pricePerRide || place.pricePerNight || place.averageCost || place.tourGuideFee || place.fee || 'N/A';
-    const type = place.type || (place.genres?.join(', ') || 'undefined');
-    return `${place.name} (${type}) – Rs ${price}`;
+    // Determine price with fallback
+    const price = place.price ?? place.pricePerRide ?? place.pricePerNight ?? place.averageCost ?? place.tourGuideFee ?? place.fee ?? 0;
+    const formattedPrice = price === 0 ? 'Free' : `Rs ${price}`;
+  
+    // Determine type or genres
+    let category = '';
+    if (place.type && place.type !== 'undefined') {
+      category = place.type;
+     } else if (place.genres && place.genres.length > 0) {
+      category = place.genres.join(', ');
+     } else {
+      category = 'general';
+     }
+     return `${place.name} (${category}) – ${formattedPrice}`;
   };
+  
 
   const startDate = itinerary.startDate || new Date();
 
