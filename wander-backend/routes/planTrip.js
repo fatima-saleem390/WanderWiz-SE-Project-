@@ -40,7 +40,6 @@ async function generateItineraryFromDB(input) {
 
   const allRestaurants = shuffle(await Restaurant.find({}));
   const usedRestaurantIds = new Set();
-  const usedAccommodationIds = new Set();
   const usedActivityIds = new Set();
 
   const dailyPlan = [];
@@ -54,7 +53,6 @@ async function generateItineraryFromDB(input) {
       const stay = await Accommodation.findOne({
         type: cleanedInput.accommodation,
         pricePerNight: { $lte: remainingBudget }
-        // Removed _id filter so you can use same place multiple days
       });
       if (stay) {
         dayPlan.accommodation = {
@@ -62,35 +60,38 @@ async function generateItineraryFromDB(input) {
           pricePerNight: stay.pricePerNight
         };
         remainingBudget -= stay.pricePerNight;
-        // No need to track accommodation usage if it's allowed daily
       }
     }
 
     // TRANSPORT
     if (cleanedInput.transport !== 'Walk Only') {
-      const transportData = await TransportOption.findOne({ type: cleanedInput.transport });
+      const transportData = await TransportOption.findOne({
+        type: new RegExp(`^${cleanedInput.transport}$`, 'i')
+      });
+
       if (transportData && transportData.options.length > 0) {
-        const bestOption = transportData.options.find(opt => opt.pricePerRide <= remainingBudget);
-        if (bestOption) {
+        const affordableOptions = transportData.options.filter(opt => opt.pricePerRide <= remainingBudget);
+        const transportChoicePool = affordableOptions;
+
+        if (transportChoicePool.length > 0) {
+          const selectedTransport = transportChoicePool[Math.floor(Math.random() * transportChoicePool.length)];
           dayPlan.activities.push({
             type: 'transport',
-            name: bestOption.name,
-            pricePerRide: bestOption.pricePerRide
+            name: selectedTransport.name,
+            pricePerRide: selectedTransport.pricePerRide
           });
-          remainingBudget -= bestOption.pricePerRide;
+          remainingBudget -= selectedTransport.pricePerRide;
         }
       }
     }
 
     // MEALS (max 3)
     let mealsAdded = 0;
-
     const matchingRestaurants = allRestaurants.filter(rest =>
       rest.genres.some(g =>
         cleanedInput.interests.includes(g.trim().toLowerCase())
       )
     );
-
     const restaurantPool = matchingRestaurants.length > 0 ? matchingRestaurants : allRestaurants;
 
     for (let i = 0; i < restaurantPool.length && mealsAdded < 3; i++) {
@@ -110,85 +111,86 @@ async function generateItineraryFromDB(input) {
       }
     }
 
-    // INTERESTS / ACTIVITIES
+    // ACTIVITIES
     const maxActivities = cleanedInput.pace === 'Fast-Paced' ? 6 : cleanedInput.pace === 'Relaxed' ? 2 : 3;
-    let count = 0;
+    const activityPool = [];
 
     for (let interest of cleanedInput.interests) {
-      if (count >= maxActivities) break;
+      if (interest === 'culture') {
+        const places = await HistoricalPlace.find({
+          genres: { $in: ['Culture'] },
+          tourGuideFee: { $lte: remainingBudget },
+          _id: { $nin: Array.from(usedActivityIds) }
+        });
 
-      switch (interest) {
-        case 'culture': {
-          const places = await HistoricalPlace.find({
-            genres: { $in: ['Culture'] },
-            tourGuideFee: { $lte: remainingBudget },
-            _id: { $nin: Array.from(usedActivityIds) }
+        for (const place of places) {
+          activityPool.push({
+            type: 'historical place',
+            name: place.name,
+            entryFee: place.tourGuideFee,
+            guideFee: place.tourGuideFee ? `(Optional guide: $${place.tourGuideFee})` : undefined,
+            cost: place.tourGuideFee,
+            _id: place._id.toString()
           });
-          if (places.length > 0) {
-            const place = places[Math.floor(Math.random() * places.length)];
-            dayPlan.activities.push({
-              type: 'historical place',
-              name: place.name,
-              entryFee: place.tourGuideFee,
-              guideFee: place.tourGuideFee ? `(Optional guide: $${place.tourGuideFee})` : undefined
-            });
-            // tourGuideFee is optional and not subtracted from remainingBudget
-            usedActivityIds.add(place._id.toString());
-            count++;
-          }
-          break;
         }
 
-        case 'adventure':
-        case 'nature':
-        case 'festivals':
-        case 'shopping':
-        case 'relaxation':
-        case 'insta spots': {
-          const activities = await OutdoorActivity.find({
-            genres: { $in: [interest] },
-            price: { $lte: remainingBudget },
-            _id: { $nin: Array.from(usedActivityIds) }
+      } else {
+        const activities = await OutdoorActivity.find({
+          genres: { $in: [interest] },
+          price: { $lte: remainingBudget },
+          _id: { $nin: Array.from(usedActivityIds) }
+        });
+
+        for (const act of activities) {
+          activityPool.push({
+            type: 'outdoor activity',
+            name: act.name,
+            fee: act.price,
+            cost: act.price,
+            _id: act._id.toString()
           });
-          if (activities.length > 0) {
-            const activity = activities[Math.floor(Math.random() * activities.length)];
-            dayPlan.activities.push({
-              type: 'outdoor activity',
-              name: activity.name,
-              fee: activity.price
-            });
-            remainingBudget -= activity.price;
-            usedActivityIds.add(activity._id.toString());
-            count++;
-          }
-          break;
         }
       }
     }
 
-    // Calculate actual amount spent (including accommodation, transport, meals, and activities)
+    shuffle(activityPool);
+
+    let addedCount = 0;
+    for (const activity of activityPool) {
+      if (addedCount >= maxActivities) break;
+      if (activity.cost <= remainingBudget) {
+        if (activity.type === 'historical place') {
+          dayPlan.activities.push({
+            type: activity.type,
+            name: activity.name,
+            entryFee: activity.entryFee,
+            guideFee: activity.guideFee
+          });
+        } else {
+          dayPlan.activities.push({
+            type: activity.type,
+            name: activity.name,
+            fee: activity.fee
+          });
+        }
+        remainingBudget -= activity.cost;
+        usedActivityIds.add(activity._id);
+        addedCount++;
+      }
+    }
+
+    // Final amount spent
     let amountSpent = 0;
-
     for (let act of dayPlan.activities) {
-      if (act.type === 'transport') {
-        amountSpent += act.pricePerRide;
-      } else if (act.type === 'historical place') {
-        amountSpent += act.entryFee;
-      } else if (act.type === 'outdoor activity') {
-        amountSpent += act.fee;
-      }
+      if (act.type === 'transport') amountSpent += act.pricePerRide;
+      else if (act.type === 'historical place') amountSpent += act.entryFee;
+      else if (act.type === 'outdoor activity') amountSpent += act.fee;
     }
 
-    // Include accommodation cost if present
-    if (dayPlan.accommodation) {
-      amountSpent += dayPlan.accommodation.pricePerNight;
-    }
+    if (dayPlan.accommodation) amountSpent += dayPlan.accommodation.pricePerNight;
+    for (let meal of dayPlan.meals) amountSpent += meal.averageCost;
 
-    for (let meal of dayPlan.meals) {
-      amountSpent += meal.averageCost;
-    }
-
-    dayPlan.budget = amountSpent.toFixed(2);  // Total amount spent for the day
+    dayPlan.budget = amountSpent.toFixed(2);
     dailyPlan.push(dayPlan);
   }
 

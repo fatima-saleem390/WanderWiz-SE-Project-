@@ -1,4 +1,6 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+DB_URI=mongodb+srv://wanderuser:wanderuser123@wanderwiz.rog2ctz.mongodb.net/wanderwiz?retryWrites=true&w=majority&appName=wanderwiz
+JWT_SECRET=wanderuser123
 
 # dependencies
 /node_modules
