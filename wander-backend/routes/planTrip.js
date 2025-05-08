@@ -46,24 +46,23 @@ async function generateItineraryFromDB(input) {
   const dailyPlan = [];
 
   for (let day = 1; day <= totalDays; day++) {
-    const dayPlan = { day, activities: [], meals: [] };
+    const dayPlan = { day, activities: [], meals: [], accommodations: [] };
     let remainingBudget = perPersonPerDayBudget;
 
     // ACCOMMODATION
     if (cleanedInput.accommodation !== 'None') {
       const stay = await Accommodation.findOne({
         type: cleanedInput.accommodation,
-        pricePerNight: { $lte: remainingBudget },
-        _id: { $nin: Array.from(usedAccommodationIds) }
+        pricePerNight: { $lte: remainingBudget }
+        // Removed _id filter so you can use same place multiple days
       });
       if (stay) {
-        dayPlan.activities.push({
-          type: 'accommodation',
+        dayPlan.accommodation = {
           name: stay.name,
           pricePerNight: stay.pricePerNight
-        });
+        };
         remainingBudget -= stay.pricePerNight;
-        usedAccommodationIds.add(stay._id.toString());
+        // No need to track accommodation usage if it's allowed daily
       }
     }
 
@@ -133,7 +132,7 @@ async function generateItineraryFromDB(input) {
               entryFee: place.tourGuideFee,
               guideFee: place.tourGuideFee ? `(Optional guide: $${place.tourGuideFee})` : undefined
             });
-            // Note: tourGuideFee is optional and not subtracted from remainingBudget
+            // tourGuideFee is optional and not subtracted from remainingBudget
             usedActivityIds.add(place._id.toString());
             count++;
           }
@@ -167,28 +166,29 @@ async function generateItineraryFromDB(input) {
       }
     }
 
-    // Calculate actual amount spent (excluding optional guide fee)
+    // Calculate actual amount spent (including accommodation, transport, meals, and activities)
     let amountSpent = 0;
 
     for (let act of dayPlan.activities) {
-      if (act.type === 'accommodation') {
-        amountSpent += act.pricePerNight;
-      } else if (act.type === 'transport') {
+      if (act.type === 'transport') {
         amountSpent += act.pricePerRide;
       } else if (act.type === 'historical place') {
-        amountSpent += act.entryFee; // Exclude guideFee from total
+        amountSpent += act.entryFee;
       } else if (act.type === 'outdoor activity') {
         amountSpent += act.fee;
       }
+    }
+
+    // Include accommodation cost if present
+    if (dayPlan.accommodation) {
+      amountSpent += dayPlan.accommodation.pricePerNight;
     }
 
     for (let meal of dayPlan.meals) {
       amountSpent += meal.averageCost;
     }
 
-    //dayPlan.amountSpent = amountSpent.toFixed(2);
-    dayPlan.budget = amountSpent.toFixed(2);
-
+    dayPlan.budget = amountSpent.toFixed(2);  // Total amount spent for the day
     dailyPlan.push(dayPlan);
   }
 
