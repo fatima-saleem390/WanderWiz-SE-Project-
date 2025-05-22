@@ -8,18 +8,18 @@ import mosqueVector from '../assets/vector.jpg';
 const Login = () => {
   const navigate = useNavigate();
 
-  // State to hold form values
   const [formData, setFormData] = useState({
     email: '',
     password: ''
   });
 
-  // Handle input changes
+  const [successMessage, setSuccessMessage] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
+
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  // Submit login data to backend
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -32,15 +32,20 @@ const Login = () => {
       const result = await res.json();
 
       if (res.ok) {
-        alert('Login successful!');
-        localStorage.setItem('token', result.token); // Optional: save token
-        navigate('/home');
+        setSuccessMessage('Login successful! Redirecting...');
+        setErrorMessage('');
+        localStorage.setItem('token', result.token);
+        setTimeout(() => {
+          navigate('/home');
+        }, 2000);
       } else {
-        alert(result.message || 'Invalid login credentials');
+        setErrorMessage(result.message || 'Invalid login credentials');
+        setSuccessMessage('');
       }
     } catch (err) {
       console.error('Login error:', err);
-      alert('An error occurred. Please try again.');
+      setErrorMessage('An error occurred. Please try again.');
+      setSuccessMessage('');
     }
   };
 
@@ -55,6 +60,10 @@ const Login = () => {
       <div className="login-form">
         <h2>Welcome</h2>
         <p>Login with Email</p>
+
+        {successMessage && <p className="success-message">{successMessage}</p>}
+        {errorMessage && <p className="error-message">{errorMessage}</p>}
+
         <form onSubmit={handleSubmit}>
           <input
             type="email"
